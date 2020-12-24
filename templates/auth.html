@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Authentication{% endblock %}
+
+{% block content %}
+<script>
+    inputs = [
+        "signup-f_name",
+        "signup-l_name",
+        "signup-email",
+        "signup-pass",
+        "signup-confirm-pass","signup-submit"
+    ];
+    window.onload = function () {
+        var action = "{{action | safe}}";
+        const loginElement = document.getElementById("login")
+        const signupElement = document.getElementById("signup")
+        if (action == "login") {
+            loginElement.style.display = "block";
+        } else if (action == "signup") {
+            signupElement.style.display = "block";
+        } else {
+            window.location.replace("/404");
+        }
+    }
+    const empty = (element) => document.getElementById(element).value === "";
+    document.onkeyup = function() {
+        if ((inputs.some(empty)) || (document.getElementById('signup-pass').value != document.getElementById('signup-confirm-pass').value)) {
+            document.getElementById("signup-submit").disabled = true;
+        } else {
+            document.getElementById("signup-submit").disabled = false;
+        }
+
+    }
+</script>
+
+<div id="login">
+<h1>Login</h1>
+        {% if error_msg %}
+        <p>{{error_msg}}</p>
+    {% endif %}
+<form action="{{url_for('auth_verification')}}" method="POST">
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="password" name="password" placeholder="Password" minlength="8" maxlength="20" autocomplete="off" required>
+    <input type="Submit" value="Log In">
+</form>
+    <a href="{{url_for('auth', action='signup')}}">Don't Have an Account? Sign Up.</a>
+</div>
+
+<div id="signup">
+<h1>Sign Up</h1>
+    {% if error_msg %}
+        <p>{{error_msg}}</p>
+    {% endif %}
+<form action="{{url_for('auth_verification')}}" method="POST">
+    <input type="text" id="signup-f_name" name="f_name" placeholder="First Name" maxlength="50"  autocomplete="off" required>
+    <input type="text" id="signup-l_name" name="l_name" placeholder="Last Name" maxlength="50" autocomplete="off" required>
+    <input type="email" id="signup-email" name="email" placeholder="Email" autocomplete="off" required>
+    <input type="password" id='signup-pass' name="password" placeholder="Password" maxlength="20" minlength="8" autocomplete="off" required>
+    <input type="password" id='signup-confirm-pass' name="confirm-password" placeholder="Confirm Password" minlength="8" maxlength="20" autocomplete="off" required>
+    <input type="Submit" id='signup-submit' value="Sign Up" disabled>
+</form>
+    <a href="{{url_for('auth', action='login')}}">Already have an account? Log In.</a>
+</div>
+
+{% endblock %}

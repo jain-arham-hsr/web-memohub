@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+        </style>
+    </head>
+
+    <body>
+        <h1>Manage Studies</h1>
+        <div>
+            <a href = "#">English</a>
+            <a href = "#">Hindi</a>
+            <a href = "#">Maths</a>
+            <a href = "#">Science</a>
+            <a href = "#">Social Science</a>
+            <a href = "#">Sanskit </a>
+        </div>
+        <ol id ="list"></ol>
+        <button onclick="window.location.replace('{{url_for('logout')}}')">Logout</button>
+        <script>
+            data = JSON.parse(fetch('https://jsonplaceholder.typicode.com/posts'))
+            console.log(data)
+            exampleList = data
+            listElement = document.getElementById('list');
+            exampleList.forEach((item) => {
+                createListItem(item);
+            });
+            
+            function createListItem(itemText){
+                var listItem = document.createElement("li");
+                listItem.appendChild(document.createTextNode(itemText));
+                listElement.appendChild(listItem);
+            }
+
+        </script>
+
+    </body>
+</html>
