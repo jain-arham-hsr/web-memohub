@@ -30,7 +30,6 @@ def home():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    print(session['uid'])
     return render_template("dashboard.html")
 
 
@@ -70,7 +69,6 @@ def auth_verification():
             l_name = request.form['l_name']
             email = request.form['email']
             password = request.form['password']
-            print(f_name, l_name, email, password)
             signup_success, msg = signup(f_name, l_name, email, password)
             if signup_success:
                 return redirect(url_for('auth', action="login"))
@@ -78,6 +76,12 @@ def auth_verification():
                 auth_error_msg = msg
                 return redirect(url_for('auth', action="signup"))
     return render_template('404.html')
+
+
+@app.route('/dashboard/<subject>/')
+@login_required
+def subject(subject):
+    return subject
 
 
 # logout function
