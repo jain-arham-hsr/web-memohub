@@ -44,6 +44,7 @@ def not_found_error(_):
 def auth(action):
     global auth_action, auth_error_msg
     auth_action = action
+    print(auth_action)
     locale_error_msg = auth_error_msg
     auth_error_msg = None
     return render_template('auth.html', action=action, error_msg=locale_error_msg)
