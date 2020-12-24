@@ -46,7 +46,7 @@ def auth(action):
 # auth verification
 @app.route('/auth', methods=['POST'])
 def auth_verification():
-    if request.method == 'POST' and session['auth_action']:
+    if request.method == 'POST' and session.get('auth_action', None):
         if session['auth_action'] == "login":
             email = request.form['email']
             password = request.form['password']
@@ -68,7 +68,6 @@ def auth_verification():
             else:
                 session['auth_error_msg'] = msg
                 return redirect(url_for('auth', action="signup"))
-    print(request.method, session['auth_action'])
     return render_template('404.html')
 
 
