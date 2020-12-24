@@ -47,7 +47,7 @@ def login(email, password):
     except:
         return False, response['error']['message']
     if email_verified:
-        return True, "Login Successful"
+        return True, user_data['users'][0]['localId']
     else:
         send_verification_email(id_token)
         return False, "We need to verify your email first. Please check your Inbox for the verification email."

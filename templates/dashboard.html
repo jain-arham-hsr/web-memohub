@@ -1,36 +1,36 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <style>
-        </style>
+        <title>Dashboard</title>
     </head>
-
     <body>
-        <h1>Manage Studies</h1>
         <div>
-            <a href = "#">English</a>
-            <a href = "#">Hindi</a>
-            <a href = "#">Maths</a>
-            <a href = "#">Science</a>
-            <a href = "#">Social Science</a>
-            <a href = "#">Sanskit </a>
+            <ul id="ul"></ul>
+            <p id="p"></p>
         </div>
-        <ol id ="list"></ol>
         <button onclick="window.location.replace('{{url_for('logout')}}')">Logout</button>
         <script>
-            data = JSON.parse(fetch('https://jsonplaceholder.typicode.com/posts'))
-            console.log(data)
-            exampleList = data
-            listElement = document.getElementById('list');
-            exampleList.forEach((item) => {
-                createListItem(item);
+            const list = document.getElementById("ul");
+            let object1;
+            fetch("https://project-aa-e98db-default-rtdb.firebaseio.com/.json")
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("error fetching data from the api/database");
+                } else {
+                    return response.json();
+                }
+            })
+            .then((response) => {
+                for (let key in response['Hindi']) {
+                    // console.log(response)
+                    let listItem = document.createElement("li");
+                    listItem.textContent = key;
+                    list.appendChild(listItem);
+                }
+            })
+            .catch((err) => {
+                console.error(err.message);
             });
-            
-            function createListItem(itemText){
-                var listItem = document.createElement("li");
-                listItem.appendChild(document.createTextNode(itemText));
-                listElement.appendChild(listItem);
-            }
 
         </script>
 

@@ -13,7 +13,7 @@ auth_error_msg = None
 def login_required(f):
     @wraps(f)
     def wrap(*args, **kwargs):
-        if 'email' in session:
+        if 'uid' in session:
             return f(*args, **kwargs)
         else:
             return redirect(url_for('auth', action="login"))
@@ -30,7 +30,7 @@ def home():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    print(session['email'])
+    print(session['uid'])
     return render_template("dashboard.html")
 
 
@@ -60,7 +60,7 @@ def auth_verification():
             password = request.form['password']
             login_success, msg = login(email, password)
             if login_success:
-                session['email'] = email
+                session['uid'] = msg
                 return redirect(url_for('dashboard'))
             else:
                 auth_error_msg = msg
