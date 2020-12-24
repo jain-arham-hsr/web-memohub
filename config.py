@@ -1,0 +1,3 @@
+class BaseConfig(object):
+    DEBUG = True
+    SECRET_KEY = b"\x94<&\x9eb\xab\x10\xbd\xec7\x17g\x86a\xc4\xd2\xeaj\xf5q'\x85H9"

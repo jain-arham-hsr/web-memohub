@@ -4,6 +4,9 @@ from functools import wraps
 
 app = Flask(__name__)
 
+app.config.from_object('config.BaseConfig')
+
+
 # login required decorator
 def login_required(f):
     @wraps(f)
@@ -86,5 +89,4 @@ def logout():
 
 # Runs App
 if __name__ == '__main__':
-    app.secret_key = b"\x94<&\x9eb\xab\x10\xbd\xec7\x17g\x86a\xc4\xd2\xeaj\xf5q'\x85H9"
-    app.run(debug=True)
+    app.run()
