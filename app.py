@@ -5,10 +5,6 @@ from functools import wraps
 app = Flask(__name__)
 
 
-session['auth_action'] = None
-session['auth_error_msg'] = None
-
-
 # login required decorator
 def login_required(f):
     @wraps(f)
@@ -43,8 +39,8 @@ def not_found_error(_):
 @app.route('/auth/<action>')
 def auth(action):
     session['auth_action'] = action
-    locale_error_msg = session['auth_error_msg']
-    session['auth_error_msg'] = None
+    locale_error_msg = session.get('auth_error_msg', None)
+    session.pop('auth_error_msg', None)
     return render_template('auth.html', action=action, error_msg=locale_error_msg)
 
 
