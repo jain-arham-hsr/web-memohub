@@ -5,8 +5,8 @@ from functools import wraps
 app = Flask(__name__)
 
 
-auth_action = None
-auth_error_msg = None
+session['auth_action'] = None
+session['auth_error_msg'] = None
 
 
 # login required decorator
@@ -42,20 +42,17 @@ def not_found_error(_):
 # routes login-signup screen
 @app.route('/auth/<action>')
 def auth(action):
-    global auth_action, auth_error_msg
-    auth_action = action
-    print(auth_action)
-    locale_error_msg = auth_error_msg
-    auth_error_msg = None
+    session['auth_action'] = action
+    locale_error_msg = session['auth_error_msg']
+    session['auth_error_msg'] = None
     return render_template('auth.html', action=action, error_msg=locale_error_msg)
 
 
 # auth verification
 @app.route('/auth', methods=['POST'])
 def auth_verification():
-    if request.method == 'POST' and auth_action:
-        global auth_error_msg
-        if auth_action == "login":
+    if request.method == 'POST' and session['auth_action']:
+        if session['auth_action'] == "login":
             email = request.form['email']
             password = request.form['password']
             login_success, msg = login(email, password)
@@ -63,7 +60,7 @@ def auth_verification():
                 session['uid'] = msg
                 return redirect(url_for('dashboard'))
             else:
-                auth_error_msg = msg
+                session['auth_error_msg'] = msg
                 return redirect(url_for('auth', action="login"))
         else:
             f_name = request.form['f_name']
@@ -74,9 +71,9 @@ def auth_verification():
             if signup_success:
                 return redirect(url_for('auth', action="login"))
             else:
-                auth_error_msg = msg
+                session['auth_error_msg'] = msg
                 return redirect(url_for('auth', action="signup"))
-    print(request.method, auth_action)
+    print(request.method, session['auth_action'])
     return render_template('404.html')
 
 
@@ -97,4 +94,3 @@ def logout():
 if __name__ == '__main__':
     app.secret_key = b'c57p7p30pmjtgg4hpc06t1ny74751f'
     app.run(debug=True)
-
