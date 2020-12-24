@@ -6,25 +6,27 @@
   <body>
     <div>
       <ul id="ul"></ul>
+      <p id="p"></p>
     </div>
     <script>
       const list = document.getElementById("ul");
       let object1;
       fetch("https://project-aa-e98db-default-rtdb.firebaseio.com/.json")
         .then((response) => {
-          if (!response.ok) {
-            throw new Error("error fetching data from the api/database");
-          } else {
-            return response.json();
-          }
+            if (!response.ok) {
+                throw new Error("error fetching data from the api/database");
+            } 
+            else {
+                return response.json();
+            }
         })
         .then((response) => {
-          for (let key in response) {
-            let listItem = document.createElement("li");
-            // listItem.textContent = key + " " + response[key];
-            listItem.textContent = response[key];
-            list.appendChild(listItem);
-          }
+            for (let key in response['Hindi']) {
+                // console.log(response)
+                let listItem = document.createElement("li");
+                listItem.textContent = key;
+                list.appendChild(listItem);
+            }
         })
         .catch((err) => {
           console.error(err.message);
@@ -32,8 +34,3 @@
     </script>
   </body>
 </html>
-
-
-
-
-
