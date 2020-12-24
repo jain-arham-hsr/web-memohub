@@ -75,6 +75,7 @@ def auth_verification():
             else:
                 auth_error_msg = msg
                 return redirect(url_for('auth', action="signup"))
+    print(request.method)
     return render_template('404.html')
 
 
