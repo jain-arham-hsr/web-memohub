@@ -1,4 +1,4 @@
-from firebase_admin import credentials, initialize_app, storage, _apps
+from firebase_admin import credentials, initialize_app, storage, _apps, db
 import requests
 from decouple import config
 import json
@@ -7,10 +7,11 @@ firebase_web_api_key = config("FIREBASE_WEB_API_KEY")
 
 if not _apps:
     cred = credentials.Certificate('serviceAccountKey.json')
-    initialize_app(cred, {'storageBucket': 'project-aa-e98db.appspot.com'})
+    initialize_app(cred, {'databaseURL': 'https://project-aa-e98db-default-rtdb.firebaseio.com',
+                          'storageBucket': 'project-aa-e98db.appspot.com'})
 
 
-def signup(f_name, l_name, email, password):
+def signup(f_name, l_name, email, password, user_cat):
     firebase_signup_endpoint = "https://identitytoolkit.googleapis.com/v1/accounts:signUp"
     payload = json.dumps({
         "email": email,
@@ -24,6 +25,9 @@ def signup(f_name, l_name, email, password):
         id_token = response['idToken']
         update_profile(id_token, f"{f_name} {l_name}")
         send_verification_email(id_token)
+        save_data_to_db("users", {response['localId']:{
+            'category': user_cat
+        }})
         return True, "Registration Successful"
     else:
         return False, response['error']['message']
@@ -84,10 +88,9 @@ def send_verification_email(id_token: str):
         "requestType": "VERIFY_EMAIL",
         "idToken": id_token
     })
-    r = requests.post(send_verification_email_endpoint,
-                      params={"key": firebase_web_api_key},
-                      data=payload)
-    print(r.json())
+    requests.post(send_verification_email_endpoint,
+                  params={"key": firebase_web_api_key},
+                  data=payload)
 
 
 def upload_file_to_firebase(file_path, save_as_filename):
@@ -96,3 +99,13 @@ def upload_file_to_firebase(file_path, save_as_filename):
     blob.upload_from_filename(file_path)
     blob.make_public()
     return blob.public_url
+
+
+def save_data_to_db(key, value: dict or str):
+    ref = db.reference(key)
+    ref.set(value)
+
+
+def retrieve_data_from_db(key):
+    ref = db.reference(key)
+    ref.get()
