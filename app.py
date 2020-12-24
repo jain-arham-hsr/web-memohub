@@ -3,7 +3,6 @@ from firedb_access import *
 from functools import wraps
 
 app = Flask(__name__)
-app['SECRET_KEY'] = b"\x94<&\x9eb\xab\x10\xbd\xec7\x17g\x86a\xc4\xd2\xeaj\xf5q'\x85H9"
 
 # login required decorator
 def login_required(f):
@@ -88,5 +87,5 @@ def logout():
 
 # Runs App
 if __name__ == '__main__':
-    app.secret_key = b'c57p7p30pmjtgg4hpc06t1ny74751f'
+    app.secret_key = b"\x94<&\x9eb\xab\x10\xbd\xec7\x17g\x86a\xc4\xd2\xeaj\xf5q'\x85H9"
     app.run(debug=True)
