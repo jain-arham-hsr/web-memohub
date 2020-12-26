@@ -1,0 +1,41 @@
+{% extends "dashboard.html" %}
+
+{% block teacher_dashboard %}
+<script>
+    create_new_batch = function() {
+        document.getElementById('create-batch').style.display = 'block';
+        document.getElementById('batches').style.display = 'none';
+        document.getElementById('create-batch-btn').style.display = 'none';
+    }
+    cancel_create = function() {
+        document.getElementById('create-batch').style.display = 'none';
+        document.getElementById('batches').style.display = 'block';
+        document.getElementById('create-batch-btn').style.display = 'block';
+    }
+</script>
+
+<div id="teacher_dashboard">
+    <button onclick="create_new_batch()" id="create-batch-btn">Create new Batch</button>
+    <div id="create-batch">
+        <form action="{{url_for('new_batch')}}" method="POST">
+            <input type="text" name="class-name" placeholder="Class Name" autocomplete="off" required>
+            <input type="text" name="section" placeholder="Section" autocomplete="off" required>
+            <label for="subject">Choose a subject:</label>
+            <select name="subject" id="subject" required>
+                <option value="English">English</option>
+                <option value="Hindi">Hindi</option>
+                <option value="Mathematics">Mathematics</option>
+                <option value="Sanskrit">Sanskrit</option>
+                <option value="Social Science">Social Science</option>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Physics">Physics</option>
+                <option value="Chemistry">Chemistry</option>
+                <option value="Biology">Biology</option>
+            </select>
+            <input type="submit" name="create-batch-submit" value="Create">
+            <button onclick="cancel_create()">Cancel</button>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

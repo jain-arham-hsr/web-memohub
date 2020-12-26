@@ -1,5 +1,6 @@
-from flask import Flask, session, request, render_template, redirect, url_for
-from firedb_access import *
+from flask import Flask, session, request, render_template, redirect, url_for, flash
+from firebase_access import *
+from datetime import datetime
 from functools import wraps
 
 app = Flask(__name__)
@@ -28,13 +29,21 @@ def home():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template("dashboard.html")
+    if session.get('user_cat') == 'teacher':
+        template = 'teacher_dashboard.html'
+    else:
+        template = 'dashboard.html'
+    batches = retrieve_data_from_db(f"users/{session.get('uid')}/batches") or []
+    for index in range(len(batches)):
+        batches[index] = retrieve_data_from_db(f"batches/{batches[index]}")
+    return render_template(template, batches=batches)
 
 
 # Handles 'Not Found Error'
 @app.errorhandler(404)
 def not_found_error(_):
     return render_template('404.html'), 404
+
 
 # Handles 'Method not Allowed Error'
 @app.errorhandler(405)
@@ -45,8 +54,8 @@ def method_not_allowed_error(_):
 # routes login-signup screen
 @app.route('/auth/<action>')
 def auth(action):
-    locale_error_msg = session.get('auth_error_msg', None)
-    session.pop('auth_error_msg', None)
+    locale_error_msg = session.get('error_msg', None)
+    session.pop('error_msg', None)
     return render_template('auth.html', action=action, error_msg=locale_error_msg)
 
 
@@ -59,10 +68,13 @@ def auth_verification():
             password = request.form['password']
             login_success, msg = login(email, password)
             if login_success:
-                session['uid'] = msg
+                session['uid'] = msg[0]
+                session['display_name'] = msg[1]
+                session['email'] = email
+                session['user_cat'] = retrieve_data_from_db(f"users/{session.get('uid')}/category")
                 return redirect(url_for('dashboard'))
             else:
-                session['auth_error_msg'] = msg
+                session['error_msg'] = msg
                 return redirect(url_for('auth', action="login"))
         else:
             f_name = request.form['f_name']
@@ -70,22 +82,129 @@ def auth_verification():
             email = request.form['email']
             password = request.form['password']
             if request.form['auth-submit'] == 'Sign Up as Student':
-                user_category = "Student"
+                user_category = "student"
             elif request.form['auth-submit'] == 'Sign Up as Teacher':
-                user_category = "Teacher"
+                user_category = "teacher"
             signup_success, msg = signup(f_name, l_name, email, password, user_category)
             if signup_success:
                 return redirect(url_for('auth', action="login"))
             else:
-                session['auth_error_msg'] = msg
+                session['error_msg'] = msg
                 return redirect(url_for('auth', action="signup"))
     return render_template('404.html')
 
 
-@app.route('/dashboard/<subject>/')
+@app.route('/invite', methods=['POST'])
 @login_required
-def subject(subject):
-    return retrieve_data_from_db(subject)
+def invite():
+    if request.method == 'POST':
+        batch_id = session.get('last_batch_opened')
+        success, r = get_user_info(request.form['email'])
+        if success:
+            if f"batch_{batch_id}" not in (retrieve_data_from_db(f'users/{r.uid}/batches') or []):
+                append_to_list_db(f'users/{r.uid}/batches', f"batch_{batch_id}")
+                append_to_list_db(f'batches/batch_{batch_id}/participants', request.form['email'])
+                send_text_message(batch_id, "MemoHub", f"'{r.display_name}' added to this batch.")
+            else:
+                session['error_msg'] = "User already enrolled in this batch. Please enter email of some other user."
+        else:
+            session['error_msg'] = r
+        return redirect(url_for('render_batch_data', batch_id=batch_id))
+    return render_template('404.html')
+
+
+@app.route('/dashboard/createNewBatch/', methods=['POST'])
+@login_required
+def new_batch():
+    if request.method == 'POST':
+        if do_duplicate_batches_exist(request.form['class-name'],
+                                      request.form['section'],
+                                      request.form['subject']):
+            flash("Couldn't create batch due to duplicate data.")
+            return redirect(url_for('dashboard'))
+        batch_id = datetime.now().strftime("%Y%m%d%H%M%S%f%z")
+        save_data_to_db(f'batches/batch_{batch_id}', {
+            'name': request.form['class-name'],
+            'section': request.form['section'],
+            'subject': request.form['subject'],
+            'batch_id': batch_id,
+            'created-by': session.get('uid'),
+            'messages': [
+                {
+                    'timestamp': datetime.now().strftime("%H:%M %B %d, %Y"),
+                    'type': 'text',
+                    'sender': 'MemoHub',
+                    'value': f'{request.form["class-name"]} "{request.form["section"]}" ({request.form["subject"]}) created.'
+                }
+            ],
+            'participants': [session.get('email')]
+        })
+        append_to_list_db(f'users/{session["uid"]}/batches', f'batch_{batch_id}')
+        return redirect(url_for('dashboard'))
+    return render_template('404.html')
+
+
+def do_duplicate_batches_exist(name, section, subject):
+    batches = retrieve_data_from_db(f'users/{session["uid"]}/batches') or []
+    for batch in batches:
+        corresponding_batch_data = retrieve_data_from_db(f'batches/{batch}')
+        if all([corresponding_batch_data['name'] == name,
+                corresponding_batch_data['section'] == section,
+                corresponding_batch_data['subject'] == subject]):
+            return True
+    return False
+
+
+@app.route('/batch/<batch_id>')
+@login_required
+def render_batch_data(batch_id):
+    if f"batch_{batch_id}" in retrieve_data_from_db(f'users/{session["uid"]}/batches'):
+        session['last_batch_opened'] = batch_id
+        batch_data = retrieve_data_from_db(f'batches/batch_{batch_id}')
+        locale_error_msg = session.get('error_msg')
+        session.pop('error_msg', None)
+        return render_template('memos.html', cat=session.get('user_cat'), batch_data=batch_data, error_msg=locale_error_msg)
+    return render_template('404.html')
+
+
+def send_text_message(batch_id, sender, msg):
+    append_to_list_db(f'batches/batch_{batch_id}/messages', {
+        'timestamp': datetime.now().strftime("%H:%M %B %d, %Y"),
+        'type': 'text',
+        'sender': sender,
+        'value': msg
+    })
+
+
+def send_attachment_message(batch_id, sender, file_type, topic, file_link):
+    append_to_list_db(f'batches/batch_{batch_id}/messages', {
+        'timestamp': datetime.now().strftime("%H:%M %B %d, %Y"),
+        'type': 'file',
+        'sender': sender,
+        'value': [file_type, topic, file_link]
+    })
+
+
+@app.route('/batch/sendTextMessage', methods=['POST'])
+def send_msg():
+    if request.method == 'POST':
+        batch_id = session.get('last_batch_opened')
+        send_text_message(batch_id, session.get('display_name'), request.form['msg'])
+        return redirect(url_for('render_batch_data', batch_id=batch_id))
+    return render_template('404.html')
+
+
+@app.route('/batch/sendAttachmentMessage', methods=['POST'])
+def send_attachment():
+    if request.method == 'POST':
+        batch_id = session.get('last_batch_opened')
+        sender = session.get('display_name')
+        file_type = request.form['file-type']
+        file_link = request.form['url']
+        topic = request.form['topic']
+        send_attachment_message(batch_id, sender, file_type, topic, file_link)
+        return redirect(url_for('render_batch_data', batch_id=batch_id))
+    return render_template('404.html')
 
 
 # logout function

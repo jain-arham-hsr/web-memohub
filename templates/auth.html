@@ -43,7 +43,7 @@
         <p>{{error_msg}}</p>
     {% endif %}
 <form action="{{url_for('auth_verification')}}" method="POST">
-    <input type="email" name="email" placeholder="Email" required>
+    <input type="email" name="email" placeholder="Email" autocomplete="off" required>
     <input type="password" name="password" placeholder="Password" minlength="8" maxlength="20" autocomplete="off" required>
     <input type="Submit" name="auth-submit" value="Log In">
 </form>

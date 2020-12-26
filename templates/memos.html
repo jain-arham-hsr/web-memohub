@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}{{batch_data.name}} "{{batch_data.section}}" ({{batch_data.subject}}){% endblock %}
+
+{% block content %}
+    <ul>
+        {% for msg in batch_data.messages %}
+            <li>
+                <p><b>{{msg.sender}}:</b></p>
+                {% if msg.type == 'text' %}
+                    <p>{{msg.value}}</p>
+                {% else %}
+                    <button onclick="window.open('{{msg.value[2]}}','_blank')">{{msg.value[1]}}</button>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+    {% if cat == 'teacher' %}
+        <div>
+            <form action="{{url_for('send_msg')}}" method="POST">
+                <input type="text" name="msg" placeholder="Enter message..." autocomplete="off" required>
+                <input type="submit" value="Send">
+            </form>
+            <form action="{{url_for('send_attachment')}}" method="POST">
+                <label for="file-type">Choose file type:</label>
+                <select name="file-type" id="file-type" required>
+                    <option value="pdf">PDF File</option>
+                    <option value="video">Video</option>
+                </select>
+                <input type="text" name="topic" placeholder="Topic" autocomplete="off" required>
+                <input type="url" name="url" placeholder="Enter url..." autocomplete="off" required>
+                <input type="submit" value="Send">
+            </form>
+        </div>
+
+        <h3>Add students/teachers to this Batch</h3>
+        <ol>
+            {% for participant in batch_data.participants %}
+                <li>{{participant}}</li>
+            {% endfor %}
+        </ol>
+        {% if error_msg %}
+            <p>{{error_msg}}</p>
+        {% endif %}
+        <form action="{{url_for('invite')}}" method="POST">
+            <input type="email" name="email" placeholder="Email" autocomplete="off">
+            <input type="submit" value="Add to Batch">
+        </form>
+    {% endif %}
+{% endblock %}

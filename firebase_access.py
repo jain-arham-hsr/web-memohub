@@ -1,4 +1,5 @@
-from firebase_admin import credentials, initialize_app, storage, _apps, db
+from firebase_admin import credentials, initialize_app, storage, _apps, db, auth
+from firebase_admin._auth_utils import UserNotFoundError
 import requests
 from decouple import config
 import json
@@ -25,9 +26,10 @@ def signup(f_name, l_name, email, password, user_cat):
         id_token = response['idToken']
         update_profile(id_token, f"{f_name} {l_name}")
         send_verification_email(id_token)
-        save_data_to_db("users", {response['localId']:{
-            'category': user_cat
-        }})
+        save_data_to_db(f"users/{response['localId']}", {
+            'category': user_cat,
+            'batches': []
+        })
         return True, "Registration Successful"
     else:
         return False, response['error']['message']
@@ -51,7 +53,8 @@ def login(email, password):
     except:
         return False, response['error']['message']
     if email_verified:
-        return True, user_data['users'][0]['localId']
+        print(user_data)
+        return True, (user_data['users'][0]['localId'], user_data['users'][0]['displayName'])
     else:
         send_verification_email(id_token)
         return False, "We need to verify your email first. Please check your Inbox for the verification email."
@@ -108,4 +111,22 @@ def save_data_to_db(key, value: dict or str):
 
 def retrieve_data_from_db(key):
     ref = db.reference(key)
-    ref.get()
+    return ref.get()
+
+
+def append_to_list_db(key, value_to_append):
+    batches_array = retrieve_data_from_db(key)
+    if batches_array:
+        batches_array.append(value_to_append)
+        save_data_to_db(key, batches_array)
+    else:
+        save_data_to_db(key, [value_to_append])
+
+
+def get_user_info(email):
+    try:
+        return True, auth.get_user_by_email(email)
+    except UserNotFoundError:
+        return False, "The user with that email doesn't exist in our database."
+    except ValueError:
+        return False, "Please enter a valid email address."
