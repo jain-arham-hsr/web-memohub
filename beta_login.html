@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+  font-family: Arial;
+  color: white;
+}
+
+.split {
+  height: 100%;
+  width: 50%;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  overflow-x: hidden;
+}
+
+.left {
+  left: 0;
+  background-color: black;
+}
+
+.right {
+  right: 0;
+  background-color: white;
+}
+
+.centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+body{
+    background-color: blue;
+}
+/* .centered img {
+  width: 150px;
+  border-radius: 50%;
+} */
+img{
+    height: 100%;
+    width: 100%;
+    top: 0%;
+}
+#login{
+    font-size: 400%;
+}
+#input-box1{
+    width: 100%;
+    font-size: 150%;
+    margin-bottom: 1%;
+}
+#input-box2{
+    width: 100%;
+    font-size: 150%;
+    margin-bottom: 5%;
+}
+#input-button{
+    width: 102.7%;
+    font-size: 100%;
+}
+@media (max-width: 750px) {
+    .split{
+        height: 100%;
+        width: 100%;
+        /* position: fixed; */
+        z-index: 1;
+        top: 0;
+        overflow-x: hidden;
+    }
+    .split.right{
+        display:none;
+    }
+}
+    
+</style>
+</head>
+<body>
+
+<div class="split left">
+  <div class="centered">
+        <h1 id="login">Login</h1>
+        <form action="" method="POST">
+            <input id="input-box1" type="email" name="email" placeholder="Email" autocomplete="off" required><br>
+            <input id="input-box2" type="password" name="password" placeholder="Password" autocomplete="off" required><br>
+            <input id="input-button" type="Submit" name="auth-submit" value="Log In">
+        </form>
+        <a href="">Don't Have an Account? Sign Up.</a>
+  </div>
+</div>
+
+<div class="split right">
+    <img src="./books.jpeg" alt="image">
+</div>
+     
+</body>
+</html> 
