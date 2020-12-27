@@ -42,6 +42,8 @@ def dashboard():
         batches[index] = batch_data
     decks = list(zip(*[iter(batches)]*3))
     decks.append(tuple(batches[(-1) * (len(batches) % 3):]))
+    if decks == [()]:
+        decks = None
     return render_template(template, decks=decks)
 
 
