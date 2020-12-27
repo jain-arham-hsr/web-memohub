@@ -14,16 +14,6 @@
     </script>
   {% endif %}
 {% endwith %}
-<script>
-    window.onload = function() {
-        var user_cat = '{{cat | safe}}';
-        if (user_cat == 'student') {
-            document.getElementById('msg-display').style.height = '100%';
-            msg_display_col = document.getElementById('msg-display-col');
-            msg_display_col.className = msg_display_col.className.replace("col-sm-8", "col-sm-12");
-        };
-    }
-</script>
 
 <div class="row full-page-container">
     <div id="msg-display-col" class="col-sm-8">
@@ -56,6 +46,14 @@
             {% endfor %}
         </ul>
     </div>
+	<script>
+        var user_cat = '{{cat | safe}}';
+        if (user_cat == 'student') {
+            document.getElementById('msg-display').style.height = '100%';
+            msg_display_col = document.getElementById('msg-display-col');
+            msg_display_col.className = msg_display_col.className.replace("col-sm-8", "col-sm-12");
+        };
+	</script>
     {% if cat == 'teacher' %}
         <div class="card bg-dark">
             <div class="card-body">
