@@ -1,0 +1,73 @@
+#full-page-container {
+    height: 100%;
+    padding-left: 7px;
+}
+#invitation-box {
+    height: 100%;
+}
+
+#participants {
+    height: 355px;
+    overflow: auto;
+}
+
+#invitation-title {
+    width: 100%;
+    text-align: center;
+}
+
+#msg-display {
+    padding-right: 15px;
+    height: 405px;
+    overflow: auto;
+}
+
+#email-memos {
+    width: 65%;
+}
+
+#email-submit-btn-memos {
+    float: left;
+}
+
+#send-text-message-form {
+    margin-bottom: 5px;
+}
+
+#msg-type {
+    margin-left: 5px;
+    width: fit-content;
+    display: inline;
+}
+
+#send-text-msg-input {
+    margin-right: 5px;
+    width: 54%;
+}
+
+#topic-input-memos, #url-input-memos {
+    width: 31%;
+}
+
+.text-message-memo {
+    width: auto;
+}
+
+#send-text-message-form {
+    display: inline;
+}
+
+#send-attach-message-form {
+    display: none;
+}
+
+#file-input-memos {
+    display: inline;
+    width: 25%;
+}
+
+#file-action-btn {
+    position: absolute;
+    right: 5%;
+    top: 28%;
+}

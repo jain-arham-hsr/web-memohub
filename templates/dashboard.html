@@ -2,28 +2,41 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
+<div class="container">
   {% with messages = get_flashed_messages() %}
     {% if messages %}
-      <script>
-        var messages = {{ messages | safe }};
-        window.onload = function (){
-          for (var i=0; i<messages.length; i++) {
-            alert(messages[i]);
-          }
-        }
-      </script>
+      {% for message in messages %}
+        <div class="alert alert-warning alert-dismissible">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <strong>Sorry!</strong> {{message}}
+        </div>
+      {% endfor%}
     {% endif %}
   {% endwith %}
   <div id="batches">
-    {% if batches %}
-      {% for batch in batches %}
-        <button onclick="window.location.replace('{{url_for('render_batch_data', batch_id=batch.batch_id)}}')">{{batch.name}} "{{batch.section}}" ({{batch.subject}})</button>
+    {% if decks %}
+      {% for deck in decks %}
+      <div class="card-deck">
+      {% for batch in deck %}
+        <div class="card bg-dark">
+          <div class="card-body">
+              <h4 class="card-title text-white">{{batch.name}} "{{batch.section}}"</h4>
+              <h5 class="card-title text-white">{{batch.subject}}</h5>
+              <p class="card-text text-white">Created by {{batch.creatorName}}</p>
+              <p class="card-text text-white">on {{batch['creation-date']}}</p>
+            <a href="{{url_for('render_batch_data', batch_id=batch.batch_id)}}" class="btn btn-secondary stretched-link">Open Batch</a>
+          </div>
+        </div>
       {% endfor %}
+      </div>
+      <br>
+    {% endfor %}
     {% else %}
       <p>You are not a participant of any batch.</p>
     {% endif %}
   </div>
+  <br>
   {% block teacher_dashboard %}
   {% endblock %}
-  <button onclick="window.location.replace('{{url_for('logout')}}')">Logout</button>
+</div>
 {% endblock %}

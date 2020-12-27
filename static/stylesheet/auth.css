@@ -5,3 +5,52 @@
 #signup {
     display: none;
 }
+
+#login-head, #signup-head{
+    width: 100%;
+    text-align: center;
+}
+
+.split {
+  height: 100%;
+  width: 50%;
+  top: 0;
+  overflow: hidden;
+}
+
+.left {
+  left: 0;
+}
+
+.right {
+  position: absolute;
+  right: 0;
+  z-index: 1;
+}
+
+img{
+    height: 100%;
+    width: 100%;
+    top: 0%;
+}
+
+.centered {
+  margin-top: 11%;
+}
+
+.redirect-link {
+    padding: 5px;
+}
+
+@media (max-width: 750px) {
+    .split{
+        height: 100%;
+        width: 100%;
+        z-index: 1;
+        top: 0;
+        overflow-x: hidden;
+    }
+    .split.right{
+        display:none;
+    }
+}

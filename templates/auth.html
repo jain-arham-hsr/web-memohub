@@ -18,8 +18,10 @@
         const signupElement = document.getElementById("signup")
         if (action == "login") {
             loginElement.style.display = "block";
+            document.getElementById("right-div").style.height = '100%';
         } else if (action == "signup") {
             signupElement.style.display = "block";
+            document.getElementById("right-div").style.height = '116%';
         } else {
             window.location.replace("/404");
         }
@@ -36,35 +38,109 @@
 
     }
 </script>
+<div class="split left">
+  <div class="container">
 
-<div id="login">
-<h1>Login</h1>
-        {% if error_msg %}
-        <p>{{error_msg}}</p>
+<div class="centered" id="login">
+<h1 id="login-head" class="text-white">Login</h1>
+    {% if error_msg %}
+        <div class="alert alert-danger">
+            <strong>Oops!</strong> {{error_msg}}
+        </div>
     {% endif %}
 <form action="{{url_for('auth_verification')}}" method="POST">
-    <input type="email" name="email" placeholder="Email" autocomplete="off" required>
-    <input type="password" name="password" placeholder="Password" minlength="8" maxlength="20" autocomplete="off" required>
-    <input type="Submit" name="auth-submit" value="Log In">
+    <div class="form-group">
+        <label class="text-white" for="email-login-input">Email:</label>
+        <input class="form-control" type="email" id="email-login-input" name="email" placeholder="Email" autocomplete="off" required>
+    </div>
+    <div class="form-group">
+        <label class="text-white" for="password-login-input">Password:</label>
+        <input class="form-control" type="password" name="password" id="password-login-input" placeholder="Password" minlength="8" maxlength="20" autocomplete="off" required>
+    </div>
+    <input class="btn btn-dark btn-block" type="Submit" name="auth-submit" value="Log In">
 </form>
-    <a href="{{url_for('auth', action='signup')}}">Don't Have an Account? Sign Up.</a>
+    <a class="redirect-link" href="{{url_for('auth', action='signup')}}">Don't Have an Account? Sign Up.</a> <br>
+    <a class="redirect-link" href="#" data-toggle="modal" data-target="#forgotPass" id="forgotPassBtn">Forgot Password?</a>
 </div>
 
 <div id="signup">
-<h1>Sign Up</h1>
+<h1 id="signup-head" class="text-white">Sign Up</h1>
     {% if error_msg %}
-        <p>{{error_msg}}</p>
+        <div class="alert alert-danger">
+            <strong>Oops!</strong> {{error_msg}}
+        </div>
     {% endif %}
 <form action="{{url_for('auth_verification')}}" method="POST">
-    <input type="text" id="signup-f_name" name="f_name" placeholder="First Name" maxlength="50"  autocomplete="off" required>
-    <input type="text" id="signup-l_name" name="l_name" placeholder="Last Name" maxlength="50" autocomplete="off" required>
-    <input type="email" id="signup-email" name="email" placeholder="Email" autocomplete="off" required>
-    <input type="password" id='signup-pass' name="password" placeholder="Password" maxlength="20" minlength="8" autocomplete="off" required>
-    <input type="password" id='signup-confirm-pass' name="confirm-password" placeholder="Confirm Password" minlength="8" maxlength="20" autocomplete="off" required>
-    <input type="Submit" id='signup-student' name="auth-submit" value="Sign Up as Student" disabled>
-    <input type="Submit" id='signup-teacher' name="auth-submit" value="Sign Up as Teacher" disabled>
+    <div class="form-group">
+        <label class="text-white" for="signup-f_name">First Name:</label>
+        <input class="form-control" type="text" id="signup-f_name" name="f_name" placeholder="Enter first name" maxlength="50"  autocomplete="off" required>
+    </div>
+    <div class="form-group">
+        <label class="text-white" for="signup-l_name">Last Name:</label>
+        <input class="form-control" type="text" id="signup-l_name" name="l_name" placeholder="Enter last name" maxlength="50" autocomplete="off" required>
+    </div>
+    <div class="form-group">
+        <label class="text-white" for="signup-email">Email:</label>
+        <input class="form-control" type="email" id="signup-email" name="email" placeholder="Enter email" autocomplete="off" required>
+    </div>
+    <div class="form-group">
+        <label class="text-white" for="signup-pass">Password:</label>
+        <input class="form-control" type="password" id='signup-pass' name="password" placeholder="Enter password" maxlength="20" minlength="8" autocomplete="off" required>
+    </div>
+    <div class="form-group">
+        <label class="text-white" for="signup-confirm-pass">Confirm Password:</label>
+        <input class="form-control" type="password" id='signup-confirm-pass' name="confirm-password" placeholder="Enter password again" minlength="8" maxlength="20" autocomplete="off" required>
+    </div>
+    <input class="btn btn-dark btn-block" type="Submit" id='signup-student' name="auth-submit" value="Sign Up as Student" disabled> <br>
+    <input class="btn btn-dark btn-block" type="Submit" id='signup-teacher' name="auth-submit" value="Sign Up as Teacher" disabled>
 </form>
-    <a href="{{url_for('auth', action='login')}}">Already have an account? Log In.</a>
+    <a class="redirect-link" href="{{url_for('auth', action='login')}}">Already have an account? Log In.</a>
 </div>
+  </div>
+</div>
+
+
+<div id="right-div" class="split right">
+    <img src="../static/school.jpg" alt="image">
+</div>
+
+<script>
+    $(document).ready(function(){
+        $("#forgotPassBtn").click(function(){
+            $("#forgotPass").modal({backdrop: true});
+    });
+</script>
+
+<div class="modal" id="forgotPass">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Forgot Password</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        <form action="{{url_for('reset_password')}}" method="POST">
+            <div class="form-group">
+                <label class="text-body" for="signup-f_name">Email:</label>
+                <input class="form-control" type="email" id="forgot-password-email" name="forgot-pass-email" placeholder="Enter email" autocomplete="off" required>
+            </div>
+            <input class="btn btn-dark btn-block" type="Submit" id='forgot-pass-submit' name="auth-submit" value="Send Password Reset Email">
+        </form>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
 
 {% endblock %}

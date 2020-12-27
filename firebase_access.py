@@ -1,4 +1,5 @@
 from firebase_admin import credentials, initialize_app, storage, _apps, db, auth
+import firebase_admin
 from firebase_admin._auth_utils import UserNotFoundError
 import requests
 from decouple import config
@@ -85,6 +86,18 @@ def update_profile(id_token, display_name):
                   data=payload)
 
 
+def send_password_reset_email(email):
+    password_reset_endpoint = 'https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode'
+    payload = json.dumps({
+        "requestType": "PASSWORD_RESET",
+        "email": email
+    })
+    r = requests.post(password_reset_endpoint,
+                  params={"key": firebase_web_api_key},
+                  data=payload)
+    return r.json()
+
+
 def send_verification_email(id_token: str):
     send_verification_email_endpoint = "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode"
     payload = json.dumps({
@@ -96,10 +109,10 @@ def send_verification_email(id_token: str):
                   data=payload)
 
 
-def upload_file_to_firebase(file_path, save_as_filename):
+def upload_file_to_firebase(file, save_as_filename):
     bucket = storage.bucket()
     blob = bucket.blob(save_as_filename)
-    blob.upload_from_filename(file_path)
+    blob.upload_from_file(file)
     blob.make_public()
     return blob.public_url
 

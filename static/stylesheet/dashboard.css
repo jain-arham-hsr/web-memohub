@@ -1,3 +1,8 @@
 #create-batch {
-    display: none
+    display: none;
+}
+
+#new-batch-heading {
+    width: 100%;
+    text-align: center;
 }

@@ -2,22 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}{% endblock %} - My Webpage</title>
+    <title>{% block title %}{% endblock %} - MemoHub</title>
     <link rel="stylesheet" href="../static/stylesheet/style.css">
-
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <header>
-            <div class="container">
-                <h1 class="logo"><a href="{{ url_for('home') }}">Project AA</a></h1>
-                <strong><nav>
-                    <ul class="menu">
-                        <li><a href="{{ url_for('home') }}">Home</a></li>
-                    </ul>
-                </nav></strong>
+        <nav id="header-navbar" class="navbar navbar-expand-sm bg-dark navbar-dark">
+            <a class="navbar-brand" href="{{ url_for('home') }}">MemoHub</a>
+            {% if not signed_out %}
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="collapsibleNavbar">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('home') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">Sign Out</a>
+                    </li>
+                </ul>
             </div>
-        </header>
-    <div id="content">
+            {% endif %}
+        </nav>
+    </header>
+    <br>
+    <div class="container-fluid">
         {% block content %}
         {% endblock %}
     </div>

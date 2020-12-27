@@ -1,4 +1,5 @@
 from flask import Flask, session, request, render_template, redirect, url_for, flash
+from werkzeug.utils import secure_filename
 from firebase_access import *
 from datetime import datetime
 from functools import wraps
@@ -6,6 +7,7 @@ from functools import wraps
 app = Flask(__name__)
 
 app.config.from_object('config.BaseConfig')
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mp3', 'docx'}
 
 
 # login required decorator
@@ -35,8 +37,12 @@ def dashboard():
         template = 'dashboard.html'
     batches = retrieve_data_from_db(f"users/{session.get('uid')}/batches") or []
     for index in range(len(batches)):
-        batches[index] = retrieve_data_from_db(f"batches/{batches[index]}")
-    return render_template(template, batches=batches)
+        batch_data = retrieve_data_from_db(f"batches/{batches[index]}")
+        batch_data['creatorName'] = firebase_admin.auth.get_user(batch_data['created-by']).display_name
+        batches[index] = batch_data
+    decks = list(zip(*[iter(batches)]*3))
+    decks.append(tuple(batches[(-1) * (len(batches) % 3):]))
+    return render_template(template, decks=decks)
 
 
 # Handles 'Not Found Error'
@@ -56,7 +62,7 @@ def method_not_allowed_error(_):
 def auth(action):
     locale_error_msg = session.get('error_msg', None)
     session.pop('error_msg', None)
-    return render_template('auth.html', action=action, error_msg=locale_error_msg)
+    return render_template('auth.html', action=action, error_msg=locale_error_msg, signed_out=True)
 
 
 # auth verification
@@ -94,6 +100,11 @@ def auth_verification():
     return render_template('404.html')
 
 
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 @app.route('/invite', methods=['POST'])
 @login_required
 def invite():
@@ -129,6 +140,7 @@ def new_batch():
             'subject': request.form['subject'],
             'batch_id': batch_id,
             'created-by': session.get('uid'),
+            'creation-date': datetime.now().strftime("%B %d, %Y"),
             'messages': [
                 {
                     'timestamp': datetime.now().strftime("%H:%M %B %d, %Y"),
@@ -176,12 +188,12 @@ def send_text_message(batch_id, sender, msg):
     })
 
 
-def send_attachment_message(batch_id, sender, file_type, topic, file_link):
+def send_attachment_message(batch_id, sender, topic, file_link):
     append_to_list_db(f'batches/batch_{batch_id}/messages', {
         'timestamp': datetime.now().strftime("%H:%M %B %d, %Y"),
         'type': 'file',
         'sender': sender,
-        'value': [file_type, topic, file_link]
+        'value': [topic, file_link]
     })
 
 
@@ -198,13 +210,27 @@ def send_msg():
 def send_attachment():
     if request.method == 'POST':
         batch_id = session.get('last_batch_opened')
-        sender = session.get('display_name')
-        file_type = request.form['file-type']
-        file_link = request.form['url']
-        topic = request.form['topic']
-        send_attachment_message(batch_id, sender, file_type, topic, file_link)
+        file = request.files['file']
+        if allowed_file(file.filename):
+            sender = session.get('display_name')
+            file_id = datetime.now().strftime("%Y%m%d%H%M%S%f%z")
+            file_link = upload_file_to_firebase(file, f"file_{file_id}.{secure_filename(file.filename).rsplit('.', 1)[1].lower()}")
+            topic = request.form['topic']
+            send_attachment_message(batch_id, sender, topic, file_link)
+        else:
+            flash('Invalid File Type')
         return redirect(url_for('render_batch_data', batch_id=batch_id))
     return render_template('404.html')
+
+
+@app.route('/resetPassword', methods=['POST'])
+def reset_password():
+    if request.method == 'POST':
+        r = send_password_reset_email(request.form['forgot-pass-email'])
+        if 'error' in r.keys():
+            session['error_msg'] = r['error']['message']
+        return redirect(url_for('auth', action='login'))
+    return "Hello, World!"
 
 
 # logout function

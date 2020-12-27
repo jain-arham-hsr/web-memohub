@@ -1,2 +1,17 @@
 @import url("./auth.css");
 @import url("./dashboard.css");
+@import url("./memos.css");
+
+html, body {
+   height: 100%;
+   background-color: #212529 !important;
+}
+
+#content {
+    width: 95%;
+    text-align: center;
+}
+
+#header-navbar {
+    z-index: 2;
+}
