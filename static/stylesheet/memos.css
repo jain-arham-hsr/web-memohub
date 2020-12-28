@@ -3,11 +3,14 @@
     padding-left: 7px;
 }
 #invitation-box {
+    margin-top: -10px;
     height: 100%;
 }
 
 #participants {
-    height: 355px;
+    padding-right: 6px;
+    height: 330px;
+    margin-bottom: 6px;
     overflow: auto;
 }
 
@@ -18,7 +21,7 @@
 
 #msg-display {
     padding-right: 15px;
-    height: 405px;
+    height: 451px;
     overflow: auto;
 }
 
@@ -70,4 +73,41 @@
     position: absolute;
     right: 5%;
     top: 28%;
+}
+
+#msg-display-col {
+    margin-top: -10px;
+}
+
+#send-card {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#invitation-card {
+    height: 543px;
+}
+
+@media (max-width: 750px) {
+    #msg-type {
+        width: calc(100% - 170px);
+    }
+    #invitation-card {
+        margin-top: 1px;
+    }
+}
+
+.delete-participant-anchor {
+    text-decoration:none;
+    float:right;
+    margin-top:-41px;
+}
+
+.delete-participant-anchor:hover {
+    text-decoration: none;
+}
+
+#deleted-batch-msg {
+    text-align: center;
+    margin-top: 16%;
 }

@@ -1,6 +1,6 @@
 from firebase_admin import credentials, initialize_app, storage, _apps, db, auth
-import firebase_admin
 from firebase_admin._auth_utils import UserNotFoundError
+import firebase_admin
 import requests
 from decouple import config
 import json
@@ -54,7 +54,6 @@ def login(email, password):
     except:
         return False, response['error']['message']
     if email_verified:
-        print(user_data)
         return True, (user_data['users'][0]['localId'], user_data['users'][0]['displayName'])
     else:
         send_verification_email(id_token)
@@ -143,3 +142,9 @@ def get_user_info(email):
         return False, "The user with that email doesn't exist in our database."
     except ValueError:
         return False, "Please enter a valid email address."
+
+
+def remove_from_list_db(key, value_to_delete):
+    batches_array = retrieve_data_from_db(key)
+    batches_array.remove(value_to_delete)
+    save_data_to_db(key, batches_array)

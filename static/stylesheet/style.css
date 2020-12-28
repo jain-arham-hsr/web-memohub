@@ -15,3 +15,8 @@ html, body {
 #header-navbar {
     z-index: 2;
 }
+
+.page-wrap {
+    height: 100%;
+    margin-top: 10%;
+}

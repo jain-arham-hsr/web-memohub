@@ -6,3 +6,7 @@
     width: 100%;
     text-align: center;
 }
+
+#subject {
+    background-image: none;
+}

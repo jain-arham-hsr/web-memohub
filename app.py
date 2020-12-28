@@ -3,6 +3,7 @@ from werkzeug.utils import secure_filename
 from firebase_access import *
 from datetime import datetime
 from functools import wraps
+import time
 
 app = Flask(__name__)
 
@@ -41,7 +42,8 @@ def dashboard():
         batch_data['creatorName'] = firebase_admin.auth.get_user(batch_data['created-by']).display_name
         batches[index] = batch_data
     decks = list(zip(*[iter(batches)]*3))
-    decks.append(tuple(batches[(-1) * (len(batches) % 3):]))
+    if len(batches) % 3 != 0:
+        decks.append(tuple(batches[(-1) * (len(batches) % 3):]))
     if decks == [()]:
         decks = None
     return render_template(template, decks=decks)
@@ -115,8 +117,9 @@ def invite():
         success, r = get_user_info(request.form['email'])
         if success:
             if f"batch_{batch_id}" not in (retrieve_data_from_db(f'users/{r.uid}/batches') or []):
+                cat = retrieve_data_from_db(f'users/{r.uid}/category')
                 append_to_list_db(f'users/{r.uid}/batches', f"batch_{batch_id}")
-                append_to_list_db(f'batches/batch_{batch_id}/participants', request.form['email'])
+                append_to_list_db(f'batches/batch_{batch_id}/participants', (request.form['email'], cat))
                 send_text_message(batch_id, "MemoHub", f"'{r.display_name}' added to this batch.")
             else:
                 session['error_msg'] = "User already enrolled in this batch. Please enter email of some other user."
@@ -151,7 +154,8 @@ def new_batch():
                     'value': f'{request.form["class-name"]} "{request.form["section"]}" ({request.form["subject"]}) created.'
                 }
             ],
-            'participants': [session.get('email')]
+            'participants': [(session.get('email'), session.get('user_cat'))],
+            'active': True
         })
         append_to_list_db(f'users/{session["uid"]}/batches', f'batch_{batch_id}')
         return redirect(url_for('dashboard'))
@@ -177,7 +181,12 @@ def render_batch_data(batch_id):
         batch_data = retrieve_data_from_db(f'batches/batch_{batch_id}')
         locale_error_msg = session.get('error_msg')
         session.pop('error_msg', None)
-        return render_template('memos.html', cat=session.get('user_cat'), batch_data=batch_data, error_msg=locale_error_msg)
+        for idx, msg in enumerate(batch_data['messages']):
+            if msg['type'] == 'text':
+                batch_data['messages'][idx]['value'] = msg['value'].replace("\r\n", "<br>")
+        batch_data['participants'].remove([session.get('email'), session.get('user_cat')])
+        is_creator = session.get('uid', None) == retrieve_data_from_db(f'batches/batch_{batch_id}/created-by')
+        return render_template('memos.html', cat=session.get('user_cat'), batch_data=batch_data, error_msg=locale_error_msg, is_creator=is_creator)
     return render_template('404.html')
 
 
@@ -233,6 +242,49 @@ def reset_password():
             session['error_msg'] = r['error']['message']
         return redirect(url_for('auth', action='login'))
     return "Hello, World!"
+
+
+def delete_participant_from_batch(email, uid, display_name, batch_id, cat):
+    remove_from_list_db(f'batches/batch_{batch_id}/participants', [email, cat])
+    remove_from_list_db(f'users/{uid}/batches', f'batch_{batch_id}')
+    send_text_message(batch_id, "MemoHub", f"'{display_name}' removed from this batch.")
+
+
+@app.route('/deleteParticipant', methods=['POST'])
+def delete_participant():
+    if request.method == 'POST':
+        participant = request.form['participant']
+        batch_id = session.get('last_batch_opened', None)
+        success, r = get_user_info(participant)
+        participant_cat = retrieve_data_from_db(f'users/{r.uid}/category')
+        if participant_cat == 'student':
+            delete_participant_from_batch(participant, r.uid, r.display_name, batch_id, participant_cat)
+        else:
+            delete_participant_from_batch(participant, r.uid, r.display_name, batch_id, participant_cat)
+        return redirect(url_for('render_batch_data', batch_id=batch_id))
+    return render_template('404.html')
+
+
+@app.route('/deleteBatch', methods=['POST'])
+def delete_batch():
+    if request.method == 'POST':
+        batch_id = session.get('last_batch_opened', None)
+        save_data_to_db(f'batches/batch_{batch_id}/active', False)
+        return redirect(url_for('render_batch_data', batch_id=batch_id))
+    return render_template('404.html')
+
+
+@app.route('/removeBatch', methods=['POST'])
+def remove_batch_from_list():
+    if request.method == 'POST':
+        batch_id = session.get('last_batch_opened', None)
+        email = session.get('email', None)
+        uid = session.get('uid', None)
+        display_name = session.get('display_name', None)
+        cat = session.get('user_cat', None)
+        delete_participant_from_batch(email, uid, display_name, batch_id, cat)
+        return redirect(url_for('home'))
+    return render_template('404.html')
 
 
 # logout function
