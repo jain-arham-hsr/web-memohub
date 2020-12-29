@@ -221,17 +221,19 @@ def send_msg():
 def send_attachment():
     if request.method == 'POST':
         batch_id = session.get('last_batch_opened')
-        file = request.files['file']
-        if allowed_file(file.filename):
-            sender = session.get('display_name')
-            file_id = datetime.now().strftime("%Y%m%d%H%M%S%f%z")
-            file_link = upload_file_to_firebase(file, f"file_{file_id}.{secure_filename(file.filename).rsplit('.', 1)[1].lower()}")
-            topic = request.form['topic']
-            send_attachment_message(batch_id, sender, topic, file_link)
-        else:
-            flash('Invalid File Type')
+        files = request.files.getlist("files")
+        for file in files:
+            if allowed_file(file.filename):
+                sender = session.get('display_name')
+                file_id = datetime.now().strftime("%Y%m%d%H%M%S%f%z")
+                file_link = upload_file_to_firebase(file, f"file_{file_id}.{secure_filename(file.filename).rsplit('.', 1)[1].lower()}")
+                topic = file.filename
+                send_attachment_message(batch_id, sender, topic, file_link)
+            else:
+                flash(f"Could not upload {file.filename} due to invalid file type")
         return redirect(url_for('render_batch_data', batch_id=batch_id))
     return render_template('404.html')
+
 
 
 @app.route('/resetPassword', methods=['POST'])
@@ -290,7 +292,7 @@ def remove_batch_from_list():
 # logout function
 @app.route('/logout')
 def logout():
-    session.pop('email', None)
+    session.pop('uid', None)
     return redirect(url_for('auth', action="login"))
 
 

@@ -5,7 +5,7 @@
 {% with messages = get_flashed_messages() %}
   {% if messages %}
     <script>
-    console.log(messages);
+    console.log('{{messages}}');
      window.onload = function() {
         var messages = {{ messages | safe }};
         for (var i=0; i<messages.length; i++) {
@@ -89,8 +89,7 @@
                         <input class="btn btn-secondary" type="submit" value="Send">
                     </form>
                     <form class="form-inline"  id="send-attach-message-form" action="{{url_for('send_attachment')}}" enctype="multipart/form-data" method="POST">
-                        <input class="form-control mr-sm-2" id="topic-input-memos" type="text" name="topic" placeholder="Topic" autocomplete="off" required>
-                        <input class="form-control-file text-white" id="file-input-memos" type="file" name="file" autocomplete="off" required>
+                        <input class="form-control-file text-white" id="file-input-memos" type="file" name="files" autocomplete="off" multiple="multiple" required>
                         <input class="btn btn-secondary btn-block" style="margin-top:7px;" type="submit" value="Send">
                     </form>
                 </div>

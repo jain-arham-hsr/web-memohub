@@ -2,6 +2,13 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
+
+<script>
+  window.onload = () => {
+    document.getElementById( "dashboard-nav-item" ).classList.add("active");
+  }
+</script>
+
 <div class="container">
   {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -32,7 +39,7 @@
         <br>
       {% endfor %}
     {% else %}
-      <p class="text-white">You are not a participant of any batch.</p>
+      <p style="width:100%;text-align:center;" class="text-white">You are not a participant of any batch.</p>
     {% endif %}
   </div>
   <br>
