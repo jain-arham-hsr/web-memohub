@@ -29,7 +29,8 @@ def signup(f_name, l_name, email, password, user_cat):
         send_verification_email(id_token)
         save_data_to_db(f"users/{response['localId']}", {
             'category': user_cat,
-            'batches': []
+            'batches': [],
+            'theme': 'light'
         })
         return True, "Registration Successful"
     else:

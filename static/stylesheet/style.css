@@ -4,7 +4,6 @@
 
 html, body {
    height: 100%;
-   background-color: #212529 !important;
 }
 
 #content {
@@ -19,4 +18,34 @@ html, body {
 .page-wrap {
     height: 100%;
     margin-top: 10%;
+}
+
+.switch {
+    align-self: flex-end;
+    margin: 0.9375rem;
+    width: fit-content;
+    margin-top:8px;
+    margin-left:27px;
+}
+
+.inner-switch {
+    display: inline-block;
+    cursor: pointer;
+    border: 1px solid #555;
+    border-radius: 1.25rem;
+    width: 3.125rem;
+    text-align: center;
+    font-size: 1rem;
+    padding: 0.1875rem;
+    margin-left: 0.3125rem;
+}
+
+.media-body {
+    margin-top: 20px;
+    margin-left: 12px;
+}
+
+#reset-pass-btn {
+    display: inline-flex;
+    align-items: center;
 }

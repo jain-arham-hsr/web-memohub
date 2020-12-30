@@ -16,24 +16,6 @@
   {% endif %}
 {% endwith %}
 
-<script>
-    function post(path, params, method='post') {
-        const form = document.createElement('form');
-        form.method = method;
-        form.action = path;
-        for (const key in params) {
-            if (params.hasOwnProperty(key)) {
-                const hiddenField = document.createElement('input');
-                    hiddenField.type = 'hidden';
-                    hiddenField.name = key;
-                    hiddenField.value = params[key];
-                    form.appendChild(hiddenField);
-                }
-            }
-            document.body.appendChild(form);
-            form.submit();
-        }
-</script>
 {% if batch_data.active %}
 
 <div class="row full-page-container">
@@ -43,21 +25,21 @@
             {% for msg in batch_data.messages|reverse %}
                 <li>
                     {% if msg.type == 'text' %}
-                        <div class="card bg-dark text-message-memo">
+                        <div class="card {{profile_data['theme']['cards']}} text-message-memo">
                             <div class="card-body">
-                                <b style="margin-top:-2px;" class="text-white">{{msg.sender}}</b>
-                                <p style="margin-bottom:-1px;margin-top:10px;" class="text-white">{{msg.value | safe}}</p>
+                                <b style="margin-top:-2px;">{{msg.sender}}</b>
+                                <p style="margin-bottom:-1px;margin-top:10px;">{{msg.value | safe}}</p>
                             </div>
                         </div>
                     {% else %}
-                        <div class="card bg-dark text-message-memo">
+                        <div class="card {{profile_data['theme']['cards']}} text-message-memo">
                             <div class="card-body">
                                 <div class="card-details">
-                                    <h5 style="margin-top:-2px;" class="text-white">{{msg.value[0]}}</h5>
-                                    <p style="margin-bottom:-1px;margin-top:10px;" class="text-white">Sent by: {{msg.sender}}</p>
+                                    <h5 style="margin-top:-2px;">{{msg.value[0]}}</h5>
+                                    <p style="margin-bottom:-1px;margin-top:10px;">Sent by: {{msg.sender}}</p>
                                 </div>
                                 <div class="file-action-btn" id="file-action-btn">
-                                    <a class="btn btn-secondary text-white" href="{{msg.value[1]}}" target="_blank">Download</a>
+                                    <a class="btn {{profile_data['theme']['buttons']}}" href="{{msg.value[1]}}" target="_blank">Download</a>
                                 </div>
                             </div>
                         </div>
@@ -76,21 +58,21 @@
         };
 	</script>
     {% if cat == 'teacher' %}
-        <div id="send-card" class="card bg-dark">
+        <div id="send-card" class="card {{profile_data['theme']['cards']}}">
             <div class="card-body">
                 <div id="msg-send">
-                    <label class="text-white" for="msg-type">Choose Message type:</label>
+                    <label for="msg-type">Choose Message type:</label>
                     <select class="form-control mr-sm-2" name="msg-type" id="msg-type" required>
                         <option value="Text">Text</option>
                         <option value="File Upload">File Upload</option>
                     </select>
                     <form class="form-inline"  id="send-text-message-form" action="{{url_for('send_msg')}}" method="POST">
                         <textarea class="form-control" rows="1" id="send-text-msg-input" name="msg" placeholder="Enter message..." autocomplete="off" required></textarea>
-                        <input class="btn btn-secondary" type="submit" value="Send">
+                        <input class="btn {{profile_data['theme']['buttons']}}" type="submit" value="Send">
                     </form>
                     <form class="form-inline"  id="send-attach-message-form" action="{{url_for('send_attachment')}}" enctype="multipart/form-data" method="POST">
-                        <input class="form-control-file text-white" id="file-input-memos" type="file" name="files" autocomplete="off" multiple="multiple" required>
-                        <input class="btn btn-secondary btn-block" style="margin-top:7px;" type="submit" value="Send">
+                        <input class="form-control-file" id="file-input-memos" type="file" name="files" autocomplete="off" multiple="multiple" required>
+                        <input class="btn {{profile_data['theme']['buttons']}} btn-block" style="margin-top:7px;" type="submit" value="Send">
                     </form>
                 </div>
             </div>
@@ -114,12 +96,12 @@
 
     {% if cat == 'teacher' %}
         <div class="col-sm-4" id="invitation-box">
-            <div class="card bg-dark" id="invitation-card">
+            <div class="card {{profile_data['theme']['cards']}}" id="invitation-card">
                 <div class="card-body">
-                    <h4 id="invitation-title" class="card-title text-white">Add students/teachers to this Batch</h4>
+                    <h4 id="invitation-title" class="card-title">Add students/teachers to this Batch</h4>
                     <form class="form-inline" action="{{url_for('invite')}}" method="POST">
                         <input class="form-control mr-sm-2" id="email-memos" type="email" name="email" placeholder="Email" autocomplete="off">
-                        <input class="btn btn-secondary" id="email-submit-btn-memos" type="submit" value="Add to Batch">
+                        <input class="btn {{profile_data['theme']['buttons']}}" id="email-submit-btn-memos" type="submit" value="Add to Batch">
                     </form>
                     {% if error_msg %}
                         <br>
@@ -129,7 +111,7 @@
                     <br>
                     <script>
                         function deleteParticipant(participant) {
-                            if (confirm(`Delete ${participant} from this batch?`)) {
+                            if (confirm(`Delete ${participant[0]} from this batch?`)) {
                                 post('{{url_for('delete_participant')}}', {'participant': participant})
                             }
                         }
@@ -137,14 +119,14 @@
                     <div id="participants">
                         <ul class="list-group">
                             {% for participant in batch_data.participants|sort %}
-                                <li style="background-color:#6C757D; height:51px; margin-bottom: 5px;" class="list-group-item text-white list-group-item-dark">
+                                <li style="background-color:{{profile_data['theme']['list-group-item-bg']}}; height:51px; margin-bottom: 5px;" class="list-group-item list-group-item-dark text-white">
                                     <p style="width:90%;">{{participant[0]}}</p>
                                     {% if participant[1] == 'teacher' %}
                                         {% if is_creator %}
-                                            <a href="javascript:deleteParticipant('{{participant}}')" class='delete-participant-anchor text-white'>&times;</a>
+                                            <a href="javascript:deleteParticipant({{participant}})" class='delete-participant-anchor'>&times;</a>
                                         {% endif %}
                                     {% else %}
-                                        <a href="javascript:deleteParticipant('{{participant}}')" class='delete-participant-anchor text-white'>&times;</a>
+                                        <a href="javascript:deleteParticipant({{participant}})" class='delete-participant-anchor'>&times;</a>
                                     {% endif %}
                                 </li>
                             {% endfor %}
@@ -159,7 +141,7 @@
                         }
                     </script>
                     {% if is_creator %}
-                        <a href="javascript:delete_batch()" class="btn btn-danger btn-block text-white">Delete Batch</a>
+                        <a href="javascript:delete_batch()" class="btn btn-danger btn-block">Delete Batch</a>
                     {% else %}
                         <script>
                             document.getElementById('participants').style.height = '367px';
@@ -173,8 +155,15 @@
 
 {% else %}
     <div class="flex-row align-items-center container" id="deleted-batch-msg">
-        <p class="text-white">This batch has been deleted and no longer accepts messages.</p>
-        <a href="javascript:post('{{url_for('remove_batch_from_list')}}')" class="btn btn-dark">Remove this Batch from your list</a>
+        <p>This batch has been deleted and no longer accepts messages.</p>
+        <a id="remove-batch-btn" href="javascript:post('{{url_for('remove_batch_from_list')}}')" class="btn {{profile_data['theme']['buttons']}}">Remove this Batch from your list</a>
+        <script>
+            if ('{{profile_data['theme']['buttons']}}' == 'btn-secondary') {
+                el = document.getElementById("remove-batch-btn")
+                el.classList.remove("btn-secondary")
+                el.classList.add("btn-dark")
+            }
+        </script>
     </div>
 {% endif%}
 {% endblock %}

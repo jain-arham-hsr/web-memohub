@@ -17,23 +17,30 @@
 </script>
 
 <div id="teacher_dashboard">
-    <button onclick="create_new_batch()" class="btn btn-dark btn-block" id="create-batch-btn">Create new Batch</button>
+    <button onclick="create_new_batch()" class="btn {{profile_data['theme']['buttons']}} btn-block" id="create-batch-btn">Create new Batch</button>
+    <script>
+        if ('{{profile_data['theme']['buttons']}}' == 'btn-secondary') {
+            el = document.getElementById("create-batch-btn")
+            el.classList.remove("btn-secondary")
+            el.classList.add("btn-dark")
+        }
+    </script>
     <br>
-    <div class="jumbotron bg-dark" id="create-batch">
-        <h3 id="new-batch-heading" class="text-white">New Batch</h3>
+    <div class="jumbotron {{profile_data['theme']['cards']}}" id="create-batch">
+        <h3 id="new-batch-heading" >New Batch</h3>
         <form class="was-validated" action="{{url_for('new_batch')}}" method="POST">
             <div class="form-group">
-                <label for="class-name" class="text-white">Class Name:</label>
+                <label for="class-name">Class Name:</label>
                 <input type="text" class="form-control" id="class-name" name="class-name" placeholder="Enter class name" autocomplete="off" required>
                 <div class="invalid-feedback">Please fill out this field.</div>
             </div>
             <div class="form-group">
-                <label for="class-name" class="text-white">Section:</label>
+                <label for="class-name">Section:</label>
                 <input type="text" class="form-control" id="section" name="section" placeholder="Enter section" autocomplete="off" required>
                 <div class="invalid-feedback">Please fill out this field.</div>
             </div>
             <div class="form-group">
-                <label for="subject" class="text-white">Choose a subject:</label>
+                <label for="subject">Choose a subject:</label>
                 <select name="subject" class="form-control" id="subject" required>
                     <option value="English">English</option>
                     <option value="Hindi">Hindi</option>
@@ -49,10 +56,10 @@
                 </select>
                 <div class="invalid-feedback">Please fill out this field.</div>
             </div>
-            <input type="submit" class="btn btn-secondary btn-block" name="create-batch-submit" value="Create" style="margin-bottom: -12px;">
+            <input type="submit" class="btn {{profile_data['theme']['buttons']}} btn-block" name="create-batch-submit" value="Create" style="margin-bottom: -12px;">
         </form>
         <br>
-        <a href="javascript:cancel_create()" class="btn btn-secondary btn-block">Cancel</a>
+        <a href="javascript:cancel_create()" class="btn {{profile_data['theme']['buttons']}} btn-block">Cancel</a>
     </div>
     <br>
 </div>

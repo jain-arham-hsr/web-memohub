@@ -101,6 +101,7 @@
     text-decoration:none;
     float:right;
     margin-top:-41px;
+    color: #ffffff;
 }
 
 .delete-participant-anchor:hover {

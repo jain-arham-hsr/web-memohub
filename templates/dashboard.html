@@ -25,13 +25,13 @@
       {% for deck in decks %}
         <div class="card-deck">
           {% for batch in deck %}
-            <div class="card bg-dark">
+            <div class="card {{profile_data['theme']['cards']}}">
               <div class="card-body">
-                <h4 class="card-title text-white">{{batch.name}} "{{batch.section}}"</h4>
-                <h5 class="card-title text-white">{{batch.subject}}</h5>
-                <p class="card-text text-white">Created by {{batch.creatorName}}</p>
-                <p class="card-text text-white">on {{batch['creation-date']}}</p>
-                <a href="{{url_for('render_batch_data', batch_id=batch.batch_id)}}" class="btn btn-secondary stretched-link">Open Batch</a>
+                <h4 class="card-title">{{batch.name}} "{{batch.section}}"</h4>
+                <h5 class="card-title">{{batch.subject}}</h5>
+                <p class="card-text">Created by {{batch.creatorName}}</p>
+                <p class="card-text">on {{batch['creation-date']}}</p>
+                <a href="{{url_for('render_batch_data', batch_id=batch.batch_id)}}" class="btn {{profile_data.theme['buttons']}} stretched-link">Open Batch</a>
               </div>
             </div>
           {% endfor %}
@@ -39,7 +39,7 @@
         <br>
       {% endfor %}
     {% else %}
-      <p style="width:100%;text-align:center;" class="text-white">You are not a participant of any batch.</p>
+      <p style="width:100%;text-align:center;">You are not a participant of any batch.</p>
     {% endif %}
   </div>
   <br>

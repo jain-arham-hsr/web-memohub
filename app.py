@@ -3,12 +3,32 @@ from werkzeug.utils import secure_filename
 from firebase_access import *
 from datetime import datetime
 from functools import wraps
-import time
 
 app = Flask(__name__)
 
 app.config.from_object('config.BaseConfig')
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mp3', 'docx'}
+
+theme = {
+    'light': {
+        'theme_name': 'light',
+        'nav': 'bg-primary',
+        'buttons': 'btn-primary',
+        'body-bg': '#ffffff',
+        'text': 'text-dark',
+        'cards': 'bg-light',
+        'list-group-item-bg': '#007BFF'
+    },
+    'dark': {
+        'theme_name': 'dark',
+        'nav': 'bg-dark',
+        'buttons': 'btn-secondary',
+        'body-bg': '#212529',
+        'text': 'text-white',
+        'cards': 'bg-dark',
+        'list-group-item-bg': '#6C757D'
+    }
+}
 
 
 # login required decorator
@@ -46,19 +66,20 @@ def dashboard():
         decks.append(tuple(batches[(-1) * (len(batches) % 3):]))
     if decks == [()]:
         decks = None
-    return render_template(template, decks=decks)
+    session['profile_data']['theme'] = theme[retrieve_data_from_db(f"users/{session.get('uid')}/theme")]
+    return render_template(template, decks=decks, profile_data=session.get('profile_data'))
 
 
 # Handles 'Not Found Error'
 @app.errorhandler(404)
 def not_found_error(_):
-    return render_template('404.html'), 404
+    return render_template('404.html', profile_data=session.get('profile_data')), 404
 
 
 # Handles 'Method not Allowed Error'
 @app.errorhandler(405)
 def method_not_allowed_error(_):
-    return render_template('404.html'), 405
+    return render_template('404.html', profile_data=session.get('profile_data')), 405
 
 
 # routes login-signup screen
@@ -82,6 +103,12 @@ def auth_verification():
                 session['display_name'] = msg[1]
                 session['email'] = email
                 session['user_cat'] = retrieve_data_from_db(f"users/{session.get('uid')}/category")
+                session['profile_data'] = {
+                    "displayName": msg[1],
+                    "email": email,
+                    "userCat": session.get('user_cat'),
+                    "theme": theme[retrieve_data_from_db(f"users/{session.get('uid')}/theme")]
+                }
                 return redirect(url_for('dashboard'))
             else:
                 session['error_msg'] = msg
@@ -186,7 +213,8 @@ def render_batch_data(batch_id):
                 batch_data['messages'][idx]['value'] = msg['value'].replace("\r\n", "<br>")
         batch_data['participants'].remove([session.get('email'), session.get('user_cat')])
         is_creator = session.get('uid', None) == retrieve_data_from_db(f'batches/batch_{batch_id}/created-by')
-        return render_template('memos.html', cat=session.get('user_cat'), batch_data=batch_data, error_msg=locale_error_msg, is_creator=is_creator)
+        session['profile_data']['theme'] = theme[retrieve_data_from_db(f"users/{session.get('uid')}/theme")]
+        return render_template('memos.html', cat=session.get('user_cat'), batch_data=batch_data, error_msg=locale_error_msg, is_creator=is_creator, profile_data=session.get('profile_data'))
     return render_template('404.html')
 
 
@@ -242,8 +270,8 @@ def reset_password():
         r = send_password_reset_email(request.form['forgot-pass-email'])
         if 'error' in r.keys():
             session['error_msg'] = r['error']['message']
-        return redirect(url_for('auth', action='login'))
-    return "Hello, World!"
+        return redirect(url_for('logout'))
+    return render_template('404.html')
 
 
 def delete_participant_from_batch(email, uid, display_name, batch_id, cat):
@@ -255,10 +283,9 @@ def delete_participant_from_batch(email, uid, display_name, batch_id, cat):
 @app.route('/deleteParticipant', methods=['POST'])
 def delete_participant():
     if request.method == 'POST':
-        participant = request.form['participant']
+        participant, participant_cat = request.form['participant'].split(',')
         batch_id = session.get('last_batch_opened', None)
         success, r = get_user_info(participant)
-        participant_cat = retrieve_data_from_db(f'users/{r.uid}/category')
         if participant_cat == 'student':
             delete_participant_from_batch(participant, r.uid, r.display_name, batch_id, participant_cat)
         else:
@@ -286,6 +313,16 @@ def remove_batch_from_list():
         cat = session.get('user_cat', None)
         delete_participant_from_batch(email, uid, display_name, batch_id, cat)
         return redirect(url_for('home'))
+    return render_template('404.html')
+
+
+@app.route('/changeTheme', methods=['POST'])
+def change_theme():
+    if request.method == 'POST':
+        uid = session.get('uid')
+        save_data_to_db(f"users/{uid}/theme", request.form['theme'])
+        session['profile_data']['theme'] = theme[request.form['theme']]
+        return redirect(url_for('dashboard'))
     return render_template('404.html')
 
 

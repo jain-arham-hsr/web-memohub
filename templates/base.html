@@ -7,21 +7,42 @@
     <link rel="stylesheet" href="../static/stylesheet/style.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
-<body>
+<body class="text-dark">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script>
+        function post(path, params, method='post') {
+            const form = document.createElement('form');
+            form.method = method;
+            form.action = path;
+            for (const key in params) {
+                if (params.hasOwnProperty(key)) {
+                    const hiddenField = document.createElement('input');
+                        hiddenField.type = 'hidden';
+                        hiddenField.name = key;
+                        hiddenField.value = params[key];
+                        form.appendChild(hiddenField);
+                    }
+                }
+                document.body.appendChild(form);
+                form.submit();
+            }
+    </script>
     <header>
-        <nav id="header-navbar" class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <nav id="header-navbar" class="navbar navbar-expand-sm bg-primary navbar-dark">
             <a class="navbar-brand" href="{{ url_for('home') }}">MemoHub</a>
             {% if not signed_out %}
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="collapsibleNavbar">
-                <ul class="navbar-nav">
+                <ul class="ml-auto navbar-nav">
                     <li class="nav-item" id="dashboard-nav-item">
                         <a class="nav-link" href="{{ url_for('home') }}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-toggle="modal" data-target="#profile">Profile</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('logout') }}">Sign Out</a>
@@ -32,6 +53,69 @@
         </nav>
     </header>
     <br>
+    {% if not signed_out %}
+    <script>
+        body = document.body
+        body.classList.remove('text-dark');
+        body.classList.add('{{profile_data['theme']['text']}}');
+        body.style.backgroundColor = '{{profile_data['theme']['body-bg']}}';
+        const navbar = document.getElementById("header-navbar");
+        navbar.classList.remove('bg-primary');
+        navbar.classList.add('{{profile_data['theme']['nav']}}');
+    </script>
+    <div class="modal text-dark" id="profile">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Profile</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <div class="media">
+                        <img src="https://firebasestorage.googleapis.com/v0/b/project-aa-e98db.appspot.com/o/profileImage.jpg?alt=media&token=6dc5a27f-7bdd-49e8-ba8e-bfd5f61237b1" alt="John Doe" class="mr-3 mt-3 rounded-circle" style="width:76px;">
+                        <div class="media-body">
+                            <h4>{{profile_data.displayName}} <small>({{profile_data.userCat}})</small></h4>
+                            <p>{{profile_data.email}}</p>
+                            <div class="d-inline-flex p-3">
+                                <a class="btn {{profile_data['theme']['buttons']}}" id='reset-pass-btn' href="javascript:post('{{url_for('reset_password')}}', {'forgot-pass-email': '{{profile_data.email}}'})">Reset Password</a>
+                                <script>
+                                    if ('{{profile_data['theme']['buttons']}}' == 'btn-secondary') {
+                                        el = document.getElementById("reset-pass-btn")
+                                        el.classList.remove("btn-secondary")
+                                        el.classList.add("btn-dark")
+                                    }
+                                </script>
+                                <div class="switch">
+                                    Dark mode: <span class="inner-switch">OFF</span>
+                                </div>
+                                <script>
+                                    if('{{profile_data['theme']['theme_name']}}' === 'dark') {
+                                        $( ".inner-switch" ).text( "ON" );
+                                    } else {
+                                        $( ".inner-switch" ).text( "OFF" );
+                                    }
+                                </script>
+                                <script>
+                                    $( ".inner-switch" ).on("click", function() {
+                                        if('{{profile_data['theme']['theme_name']}}' === 'dark') {
+                                            $( ".inner-switch" ).text( "OFF" );
+                                            post('{{url_for("change_theme")}}', {'theme': 'light'})
+                                        } else {
+                                          $( ".inner-switch" ).text( "ON" );
+                                          post('{{url_for("change_theme")}}', {'theme': 'dark'})
+                                        }
+                                    });
+                                </script>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
     <div class="container-fluid">
         {% block content %}
         {% endblock %}
