@@ -109,10 +109,10 @@ def send_verification_email(id_token: str):
                   data=payload)
 
 
-def upload_file_to_firebase(file, save_as_filename):
+def upload_file_to_firebase(file, save_as_filename, content_type):
     bucket = storage.bucket()
     blob = bucket.blob(save_as_filename)
-    blob.upload_from_file(file)
+    blob.upload_from_file(file, content_type=content_type)
     blob.make_public()
     return blob.public_url
 

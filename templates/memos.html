@@ -39,7 +39,7 @@
                                     <p style="margin-bottom:-1px;margin-top:10px;">Sent by: {{msg.sender}}</p>
                                 </div>
                                 <div class="file-action-btn" id="file-action-btn">
-                                    <a class="btn {{profile_data['theme']['buttons']}}" href="{{msg.value[1]}}" target="_blank">Download</a>
+                                    <a class="btn {{profile_data['theme']['buttons']}}" href="{{msg.value[1]}}" target="_blank">Open/Download</a>
                                 </div>
                             </div>
                         </div>
@@ -63,7 +63,7 @@
                 <div id="msg-send">
                     <label for="msg-type">Choose Message type:</label>
                     <select class="form-control mr-sm-2" name="msg-type" id="msg-type" required>
-                        <option value="Text">Text</option>
+                        <option value="Text" selected="selected">Text</option>
                         <option value="File Upload">File Upload</option>
                     </select>
                     <form class="form-inline"  id="send-text-message-form" action="{{url_for('send_msg')}}" method="POST">
@@ -132,6 +132,11 @@
                             {% endfor %}
                         </ul>
                     </div>
+                    {% if error_msg %}
+                        <script>
+                            document.getElementById('participants').style.height = '210px';
+                        </script>
+                    {% endif %}
                     <script>
                         delete_batch = function() {
                             const confirm_msg = 'Delete the batch for everyone including all the messages and files? This change is permanent and cannot be undone.'

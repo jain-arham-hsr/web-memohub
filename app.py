@@ -7,7 +7,15 @@ from functools import wraps
 app = Flask(__name__)
 
 app.config.from_object('config.BaseConfig')
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mp3', 'docx'}
+ALLOWED_EXTENSIONS = {'txt': 'text/plain',
+                      'pdf': 'application/pdf',
+                      'png': 'image/png',
+                      'jpg': 'image/jpeg',
+                      'jpeg': 'image/jpeg',
+                      'gif': 'image/gif',
+                      'mp4': 'video/mp4',
+                      'mp3': 'audio/mpeg',
+                      'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'}
 
 theme = {
     'light': {
@@ -73,12 +81,14 @@ def dashboard():
 # Handles 'Not Found Error'
 @app.errorhandler(404)
 def not_found_error(_):
+    session['profile_data']['theme'] = theme[retrieve_data_from_db(f"users/{session.get('uid')}/theme")]
     return render_template('404.html', profile_data=session.get('profile_data')), 404
 
 
 # Handles 'Method not Allowed Error'
 @app.errorhandler(405)
 def method_not_allowed_error(_):
+    session['profile_data']['theme'] = theme[retrieve_data_from_db(f"users/{session.get('uid')}/theme")]
     return render_template('404.html', profile_data=session.get('profile_data')), 405
 
 
@@ -128,12 +138,13 @@ def auth_verification():
             else:
                 session['error_msg'] = msg
                 return redirect(url_for('auth', action="signup"))
+    session['profile_data']['theme'] = theme[retrieve_data_from_db(f"users/{session.get('uid')}/theme")]
     return render_template('404.html')
 
 
 def allowed_file(filename):
     return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS.keys()
 
 
 @app.route('/invite', methods=['POST'])
@@ -153,6 +164,7 @@ def invite():
         else:
             session['error_msg'] = r
         return redirect(url_for('render_batch_data', batch_id=batch_id))
+    session['profile_data']['theme'] = theme[retrieve_data_from_db(f"users/{session.get('uid')}/theme")]
     return render_template('404.html')
 
 
@@ -186,6 +198,7 @@ def new_batch():
         })
         append_to_list_db(f'users/{session["uid"]}/batches', f'batch_{batch_id}')
         return redirect(url_for('dashboard'))
+    session['profile_data']['theme'] = theme[retrieve_data_from_db(f"users/{session.get('uid')}/theme")]
     return render_template('404.html')
 
 
@@ -215,6 +228,7 @@ def render_batch_data(batch_id):
         is_creator = session.get('uid', None) == retrieve_data_from_db(f'batches/batch_{batch_id}/created-by')
         session['profile_data']['theme'] = theme[retrieve_data_from_db(f"users/{session.get('uid')}/theme")]
         return render_template('memos.html', cat=session.get('user_cat'), batch_data=batch_data, error_msg=locale_error_msg, is_creator=is_creator, profile_data=session.get('profile_data'))
+    session['profile_data']['theme'] = theme[retrieve_data_from_db(f"users/{session.get('uid')}/theme")]
     return render_template('404.html')
 
 
@@ -242,6 +256,7 @@ def send_msg():
         batch_id = session.get('last_batch_opened')
         send_text_message(batch_id, session.get('display_name'), request.form['msg'])
         return redirect(url_for('render_batch_data', batch_id=batch_id))
+    session['profile_data']['theme'] = theme[retrieve_data_from_db(f"users/{session.get('uid')}/theme")]
     return render_template('404.html')
 
 
@@ -254,12 +269,13 @@ def send_attachment():
             if allowed_file(file.filename):
                 sender = session.get('display_name')
                 file_id = datetime.now().strftime("%Y%m%d%H%M%S%f%z")
-                file_link = upload_file_to_firebase(file, f"file_{file_id}.{secure_filename(file.filename).rsplit('.', 1)[1].lower()}")
+                file_link = upload_file_to_firebase(file, f"file_{file_id}.{secure_filename(file.filename).rsplit('.', 1)[1].lower()}", ALLOWED_EXTENSIONS[secure_filename(file.filename).rsplit('.', 1)[1].lower()])
                 topic = file.filename
                 send_attachment_message(batch_id, sender, topic, file_link)
             else:
                 flash(f"Could not upload {file.filename} due to invalid file type")
         return redirect(url_for('render_batch_data', batch_id=batch_id))
+    session['profile_data']['theme'] = theme[retrieve_data_from_db(f"users/{session.get('uid')}/theme")]
     return render_template('404.html')
 
 
@@ -271,6 +287,7 @@ def reset_password():
         if 'error' in r.keys():
             session['error_msg'] = r['error']['message']
         return redirect(url_for('logout'))
+    session['profile_data']['theme'] = theme[retrieve_data_from_db(f"users/{session.get('uid')}/theme")]
     return render_template('404.html')
 
 
@@ -291,6 +308,7 @@ def delete_participant():
         else:
             delete_participant_from_batch(participant, r.uid, r.display_name, batch_id, participant_cat)
         return redirect(url_for('render_batch_data', batch_id=batch_id))
+    session['profile_data']['theme'] = theme[retrieve_data_from_db(f"users/{session.get('uid')}/theme")]
     return render_template('404.html')
 
 
@@ -300,6 +318,7 @@ def delete_batch():
         batch_id = session.get('last_batch_opened', None)
         save_data_to_db(f'batches/batch_{batch_id}/active', False)
         return redirect(url_for('render_batch_data', batch_id=batch_id))
+    session['profile_data']['theme'] = theme[retrieve_data_from_db(f"users/{session.get('uid')}/theme")]
     return render_template('404.html')
 
 
@@ -313,6 +332,7 @@ def remove_batch_from_list():
         cat = session.get('user_cat', None)
         delete_participant_from_batch(email, uid, display_name, batch_id, cat)
         return redirect(url_for('home'))
+    session['profile_data']['theme'] = theme[retrieve_data_from_db(f"users/{session.get('uid')}/theme")]
     return render_template('404.html')
 
 
@@ -323,6 +343,7 @@ def change_theme():
         save_data_to_db(f"users/{uid}/theme", request.form['theme'])
         session['profile_data']['theme'] = theme[request.form['theme']]
         return redirect(url_for('dashboard'))
+    session['profile_data']['theme'] = theme[retrieve_data_from_db(f"users/{session.get('uid')}/theme")]
     return render_template('404.html')
 
 
