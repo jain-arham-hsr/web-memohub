@@ -1,6 +1,7 @@
 from firebase_admin import credentials, initialize_app, storage, _apps, db, auth
 from firebase_admin._auth_utils import UserNotFoundError
 import firebase_admin
+import re
 import requests
 from decouple import config
 import json
@@ -32,6 +33,14 @@ def signup(f_name, l_name, email, password, user_cat):
             'batches': [],
             'theme': 'light'
         })
+        formatted_email = re.sub("[^a-zA-Z]", "_", email)
+        if formatted_email in retrieve_data_from_db('pendingInvitation').keys():
+            for pending_batch in retrieve_data_from_db(f'pendingInvitation/{formatted_email}'):
+                append_to_list_db(f"users/{response['localId']}/batches", pending_batch)
+                batch_participants = retrieve_data_from_db(f'batches/{pending_batch}/participants')
+                batch_participants[batch_participants.index([email, 'student'])] = (email, user_cat)
+                save_data_to_db(f'batches/{pending_batch}/participants', batch_participants)
+            save_data_to_db('pendingInvitation', retrieve_data_from_db('pendingInvitation').pop(formatted_email, None))
         return True, "Registration Successful"
     else:
         return False, response['error']['message']
@@ -140,7 +149,7 @@ def get_user_info(email):
     try:
         return True, auth.get_user_by_email(email)
     except UserNotFoundError:
-        return False, "The user with that email doesn't exist in our database."
+        return False, "EMAIL_NOT_FOUND"
     except ValueError:
         return False, "Please enter a valid email address."
 

@@ -1,6 +1,7 @@
 from flask import Flask, session, request, render_template, redirect, url_for, flash
 from werkzeug.utils import secure_filename
 from firebase_access import *
+import re
 from datetime import datetime
 from functools import wraps
 
@@ -36,6 +37,10 @@ theme = {
         'cards': 'bg-dark',
         'list-group-item-bg': '#6C757D'
     }
+}
+
+error_codes = {
+
 }
 
 
@@ -152,7 +157,8 @@ def allowed_file(filename):
 def invite():
     if request.method == 'POST':
         batch_id = session.get('last_batch_opened')
-        success, r = get_user_info(request.form['email'])
+        email = request.form['email']
+        success, r = get_user_info(email)
         if success:
             if f"batch_{batch_id}" not in (retrieve_data_from_db(f'users/{r.uid}/batches') or []):
                 cat = retrieve_data_from_db(f'users/{r.uid}/category')
@@ -161,6 +167,10 @@ def invite():
                 send_text_message(batch_id, "MemoHub", f"'{r.display_name}' added to this batch.")
             else:
                 session['error_msg'] = "User already enrolled in this batch. Please enter email of some other user."
+        elif r == 'EMAIL_NOT_FOUND':
+            append_to_list_db(f"pendingInvitation/{re.sub('[^a-zA-Z]', '_', email)}", f"batch_{batch_id}")
+            append_to_list_db(f'batches/batch_{batch_id}/participants', (request.form['email'], 'student'))
+            send_text_message(batch_id, "MemoHub", f"'{email}' added to this batch.")
         else:
             session['error_msg'] = r
         return redirect(url_for('render_batch_data', batch_id=batch_id))
