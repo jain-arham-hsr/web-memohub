@@ -38,7 +38,7 @@ def signup(f_name, l_name, email, password, user_cat):
             for pending_batch in retrieve_data_from_db(f'pendingInvitation/{formatted_email}'):
                 append_to_list_db(f"users/{response['localId']}/batches", pending_batch)
                 batch_participants = retrieve_data_from_db(f'batches/{pending_batch}/participants')
-                batch_participants[batch_participants.index([email, 'student'])] = (email, user_cat)
+                batch_participants[batch_participants.index([email, 'undefined'])] = (email, user_cat)
                 save_data_to_db(f'batches/{pending_batch}/participants', batch_participants)
             save_data_to_db('pendingInvitation', retrieve_data_from_db('pendingInvitation').pop(formatted_email, None))
         return True, "Registration Successful"

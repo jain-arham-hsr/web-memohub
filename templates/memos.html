@@ -120,7 +120,7 @@
                         <ul class="list-group">
                             {% for participant in batch_data.participants|sort %}
                                 <li style="background-color:{{profile_data['theme']['list-group-item-bg']}}; height:51px; margin-bottom: 5px;" class="list-group-item list-group-item-dark text-white">
-                                    <p style="width:90%;">{{participant[0]}}</p>
+                                    <p style="width:90%;">{{participant[0]}} {% if participant[1] != 'undefined' %}<small>({{participant[1]}})</small>{% endif %}</p>
                                     {% if participant[1] == 'teacher' %}
                                         {% if is_creator %}
                                             <a href="javascript:deleteParticipant({{participant}})" class='delete-participant-anchor'>&times;</a>

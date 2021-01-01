@@ -169,7 +169,7 @@ def invite():
                 session['error_msg'] = "User already enrolled in this batch. Please enter email of some other user."
         elif r == 'EMAIL_NOT_FOUND':
             append_to_list_db(f"pendingInvitation/{re.sub('[^a-zA-Z]', '_', email)}", f"batch_{batch_id}")
-            append_to_list_db(f'batches/batch_{batch_id}/participants', (request.form['email'], 'student'))
+            append_to_list_db(f'batches/batch_{batch_id}/participants', (request.form['email'], 'undefined'))
             send_text_message(batch_id, "MemoHub", f"'{email}' added to this batch.")
         else:
             session['error_msg'] = r
@@ -313,7 +313,7 @@ def delete_participant():
         participant, participant_cat = request.form['participant'].split(',')
         batch_id = session.get('last_batch_opened', None)
         success, r = get_user_info(participant)
-        if participant_cat == 'student':
+        if participant_cat == 'student' or participant_cat == 'undefined':
             delete_participant_from_batch(participant, r.uid, r.display_name, batch_id, participant_cat)
         else:
             delete_participant_from_batch(participant, r.uid, r.display_name, batch_id, participant_cat)
