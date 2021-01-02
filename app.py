@@ -58,7 +58,10 @@ def login_required(f):
 # Routes Home (Redirects to Dashboard)
 @app.route('/')
 def home():
-    return redirect(url_for('dashboard'))
+    if session.get('uid', None):
+        return redirect(url_for('dashboard'))
+    else:
+        return render_template('home.html', signed_out=True)
 
 
 # Routes Dashboard
@@ -86,15 +89,23 @@ def dashboard():
 # Handles 'Not Found Error'
 @app.errorhandler(404)
 def not_found_error(_):
-    session['profile_data']['theme'] = theme[retrieve_data_from_db(f"users/{session.get('uid')}/theme")]
-    return render_template('404.html', profile_data=session.get('profile_data')), 404
+    if session.get('uid', None):
+        session['profile_data']['theme'] = theme[retrieve_data_from_db(f"users/{session.get('uid')}/theme")]
+        signed_out = False
+    else:
+        signed_out = True
+    return render_template('404.html', profile_data=session.get('profile_data'), signed_out=signed_out), 404
 
 
 # Handles 'Method not Allowed Error'
 @app.errorhandler(405)
 def method_not_allowed_error(_):
-    session['profile_data']['theme'] = theme[retrieve_data_from_db(f"users/{session.get('uid')}/theme")]
-    return render_template('404.html', profile_data=session.get('profile_data')), 405
+    if session.get('uid', None):
+        session['profile_data']['theme'] = theme[retrieve_data_from_db(f"users/{session.get('uid')}/theme")]
+        signed_out = False
+    else:
+        signed_out = True
+    return render_template('404.html', profile_data=session.get('profile_data'), signed_out=signed_out), 405
 
 
 # routes login-signup screen
@@ -361,7 +372,7 @@ def change_theme():
 @app.route('/logout')
 def logout():
     session.pop('uid', None)
-    return redirect(url_for('auth', action="login"))
+    return redirect(url_for('home'))
 
 
 # Runs App

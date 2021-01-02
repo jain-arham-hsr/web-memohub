@@ -1,6 +1,7 @@
 @import url("./auth.css");
 @import url("./dashboard.css");
 @import url("./memos.css");
+@import url("./home.css");
 
 html, body {
    height: 100%;

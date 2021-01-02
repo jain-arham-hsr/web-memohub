@@ -50,7 +50,7 @@ img{
         top: 0;
         overflow-x: hidden;
     }
-    .split.right{
+    #right-div{
         display:none;
     }
 }

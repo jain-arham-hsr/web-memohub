@@ -2,9 +2,78 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<div>
-    <div>
 
+<script>
+    document.body.style.overflowX = 'hidden';
+</script>
+
+<div>
+    <div class="cover">
+        <div class="cover-content">
+            <h1 id="motto">Share study material<br>&nbsp;like never before</h1>
+            <a id="signup-action-btn" class="btn btn-primary btn-lg">Get Started &#8594;</a>
+        </div>
     </div>
+    <br>
+    <h1 id="features-heading">Features</h1>
+    <div id="features-container" class="features">
+        <div class="feature d-flex">
+            <div class="feature-split p-5 feature-split-text">
+                <h3 class="feature-title">Efficient Sharing Environment</h3>
+                <p class="feature-description">Send text messages, documents, videos and other files fast and easily to your students.</p>
+            </div>
+            <div class="feature-split image-split p-5">
+                <img class="feature-image" src="../static/books.jpg">
+            </div>
+        </div>
+        <div class="feature d-flex">
+            <div class="feature-split image-split p-5">
+                <img class="feature-image" src="../static/storage.jpg">
+            </div>
+            <div class="feature-split p-5 feature-split-text">
+                <h3 class="feature-title">Easy Storage</h3>
+                <p class="feature-description">Forget about 'low storage' warnings. All your data is hosted in a cloud which you can access using any device from anywhere in the world!</p>
+            </div>
+        </div>
+        <div class="feature d-flex">
+            <div class="feature-split p-5 feature-split-text">
+                <h3 class="feature-title">Management</h3>
+                <p class="feature-description">Group your students in batches to send messages quickly.</p>
+            </div>
+            <div class="feature-split p-5 image-split">
+                <img class="feature-image" src="../static/manage.jpg">
+            </div>
+        </div>
+        <div class="feature d-flex">
+            <div class="feature-split p-5 image-split">
+                <img class="feature-image" src="../static/user_interface.jpg">
+            </div>
+            <div class="feature-split p-5 feature-split-text">
+                <h3 class="feature-title">Simple and Comfortable UI</h3>
+                <p class="feature-description">We offer a really simple and comfortable User Interface which is easy-to-understand while also being pleasant to the eyes.</p>
+            </div>
+        </div>
+        <div class="feature d-flex">
+            <div class="feature-split p-5 feature-split-text">
+                <h3 class="feature-title">Customized Theme</h3>
+                <p class="feature-description">MemoHub is equipped with in-built theme options for you to choose from.</p>
+            </div>
+            <div class="feature-split p-5 image-split">
+                <img class="feature-image" src="../static/dark_theme.jpg">
+            </div>
+        </div>
+        <div class="feature d-flex">
+            <div class="feature-split p-5 image-split">
+                <img class="feature-image" src="../static/login.jpg">
+            </div>
+            <div class="feature-split p-5 feature-split-text">
+                <h3 class="feature-title">Login Security</h3>
+                <p class="feature-description">All your data is protected with password authentication system.</p>
+            </div>
+        </div>
+    </div>
+  </div>
+        </div>
+    <div>
 </div>
 {% endblock %}

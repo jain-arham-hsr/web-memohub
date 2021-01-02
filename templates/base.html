@@ -32,27 +32,38 @@
     <header>
         <nav id="header-navbar" class="navbar navbar-expand-sm bg-primary navbar-dark">
             <a class="navbar-brand" href="{{ url_for('home') }}">MemoHub</a>
-            {% if not signed_out %}
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="collapsibleNavbar">
-                <ul class="ml-auto navbar-nav">
-                    <li class="nav-item" id="dashboard-nav-item">
-                        <a class="nav-link" href="{{ url_for('home') }}">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-toggle="modal" data-target="#profile">Profile</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('logout') }}">Sign Out</a>
-                    </li>
-                </ul>
+                {% if signed_out %}
+                    <ul class="ml-auto navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('auth', action='signup') }}">Sign Up</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('auth', action='login') }}">Log In</a>
+                        </li>
+                    </ul>
+                {% else %}
+                    <ul class="ml-auto navbar-nav">
+                        <li class="nav-item" id="dashboard-nav-item">
+                            <a class="nav-link" href="{{ url_for('home') }}">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-toggle="modal" data-target="#profile">Profile</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('logout') }}">Sign Out</a>
+                        </li>
+                    </ul>
+                {% endif %}
             </div>
-            {% endif %}
         </nav>
     </header>
+    {% if not signed_out %}
     <br>
+    {% endif %}
     {% if not signed_out %}
     <script>
         body = document.body
@@ -116,9 +127,13 @@
         </div>
     </div>
     {% endif %}
-    <div class="container-fluid">
-        {% block content %}
-        {% endblock %}
-    </div>
+    {% if not signed_out %}
+        <div class="container-fluid">
+    {% endif %}
+    {% block content %}
+    {% endblock %}
+    {% if not signed_out %}
+        </div>
+    {% endif %}
 </body>
 </html>

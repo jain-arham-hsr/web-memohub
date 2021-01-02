@@ -1,0 +1,86 @@
+body {
+  margin: 0;
+}
+
+.cover {
+  background-image: url('../classroom.jpg');
+  background-color: #cccccc;
+  width: 100vw;
+  height: calc(100vh - 56px);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  position: relative;
+}
+
+.cover-content {
+  text-align: center;
+  width: fit-content;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+}
+
+@media (max-width: 750px) {
+    .cover {
+        background-position: 2% 50%;
+    }
+    #motto {
+        font-size: 46px !important;
+    }
+    .image-split {
+        display: none;
+    }
+
+    #features-container .feature-split-text {
+        padding: 11px !important;
+        box-sizing: border-box;
+        width: 100%;
+    }
+}
+
+#signup-action-btn {
+    box-shadow: -2px -1px 17px #000;
+}
+
+
+#motto {
+    width: fit-content;
+    color: white;
+    text-shadow: -2px -1px 50px #000, 2px -1px 50px #000, -2px 1px 50px #000, 2px 1px 50px #000;
+    font-size: 70px;
+    text-align: center;
+}
+
+#features-heading {
+    width: 100%;
+    text-align: center;
+    padding: 32px;
+}
+
+.feature {
+    height: 400px;
+}
+
+.feature-split {
+    width: 50%;
+}
+
+.feature-image {
+    border-radius: 108px;
+}
+
+.feature-title {
+    font-size: 35px;
+}
+
+.feature-description {
+    font-size: 30px;
+}
+
+.feature-split-text {
+    margin: auto;
+}
