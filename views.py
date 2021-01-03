@@ -6,7 +6,8 @@ from datetime import datetime
 from decouple import config
 import ast
 
-from memohub.helpers import login_required, Firebase, Memohub, set_theme, validate_duplicate_batches, validate_file_format, format_email
+# noinspection PyPackageRequirements,PyUnresolvedReferences
+from helpers import login_required, Firebase, Memohub, set_theme, validate_duplicate_batches, validate_file_format, format_email
 
 
 Firebase = Firebase()
