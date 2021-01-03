@@ -66,11 +66,11 @@
                         <option value="Text" selected="selected">Text</option>
                         <option value="File Upload">File Upload</option>
                     </select>
-                    <form class="form-inline"  id="send-text-message-form" action="{{url_for('send_msg')}}" method="POST">
+                    <form class="form-inline"  id="send-text-message-form" action="{{url_for('send_text_msg')}}" method="POST">
                         <textarea class="form-control" rows="1" id="send-text-msg-input" name="msg" placeholder="Enter message..." autocomplete="off" required></textarea>
                         <input class="btn {{profile_data['theme']['buttons']}}" type="submit" value="Send">
                     </form>
-                    <form class="form-inline"  id="send-attach-message-form" action="{{url_for('send_attachment')}}" enctype="multipart/form-data" method="POST">
+                    <form class="form-inline"  id="send-attach-message-form" action="{{url_for('send_attach_msg')}}" enctype="multipart/form-data" method="POST">
                         <input class="form-control-file" id="file-input-memos" type="file" name="files" autocomplete="off" multiple="multiple" required>
                         <input class="btn {{profile_data['theme']['buttons']}} btn-block" style="margin-top:7px;" type="submit" value="Send">
                     </form>
@@ -99,7 +99,7 @@
             <div class="card {{profile_data['theme']['cards']}}" id="invitation-card">
                 <div class="card-body">
                     <h4 id="invitation-title" class="card-title">Add students/teachers to this Batch</h4>
-                    <form class="form-inline" action="{{url_for('invite')}}" method="POST">
+                    <form class="form-inline" action="{{url_for('add_participant')}}" method="POST">
                         <input class="form-control mr-sm-2" id="email-memos" type="email" name="email" placeholder="Email" autocomplete="off">
                         <input class="btn {{profile_data['theme']['buttons']}}" id="email-submit-btn-memos" type="submit" value="Add to Batch">
                     </form>
@@ -112,7 +112,7 @@
                     <script>
                         function deleteParticipant(participant) {
                             if (confirm(`Delete ${participant[0]} from this batch?`)) {
-                                post('{{url_for('delete_participant')}}', {'participant': participant})
+                                post('{{url_for('remove_participant')}}', {'participant': participant})
                             }
                         }
                     </script>
@@ -161,7 +161,7 @@
 {% else %}
     <div class="flex-row align-items-center container" id="deleted-batch-msg">
         <p>This batch has been deleted and no longer accepts messages.</p>
-        <a id="remove-batch-btn" href="javascript:post('{{url_for('remove_batch_from_list')}}')" class="btn {{profile_data['theme']['buttons']}}">Remove this Batch from your list</a>
+        <a id="remove-batch-btn" href="javascript:post('{{url_for('remove_batch')}}')" class="btn {{profile_data['theme']['buttons']}}">Remove this Batch from your list</a>
         <script>
             if ('{{profile_data['theme']['buttons']}}' == 'btn-secondary') {
                 el = document.getElementById("remove-batch-btn")

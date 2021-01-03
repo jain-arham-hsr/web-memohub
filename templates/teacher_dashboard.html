@@ -28,7 +28,7 @@
     <br>
     <div class="jumbotron {{profile_data['theme']['cards']}}" id="create-batch">
         <h3 id="new-batch-heading" >New Batch</h3>
-        <form class="was-validated" action="{{url_for('new_batch')}}" method="POST">
+        <form class="was-validated" action="{{url_for('create_batch')}}" method="POST">
             <div class="form-group">
                 <label for="class-name">Class Name:</label>
                 <input type="text" class="form-control" id="class-name" name="class-name" placeholder="Enter class name" autocomplete="off" required>

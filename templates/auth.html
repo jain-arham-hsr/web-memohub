@@ -19,6 +19,7 @@
         if (action == "login") {
             loginElement.style.display = "block";
             document.getElementById("right-div").style.height = '100%';
+            document.body.style.overflowY = "hidden";
         } else if (action == "signup") {
             signupElement.style.display = "block";
             document.getElementById("right-div").style.height = '116%';
@@ -57,7 +58,7 @@
         <label for="password-login-input">Password:</label>
         <input class="form-control" type="password" name="password" id="password-login-input" placeholder="Password" minlength="8" maxlength="20" autocomplete="off" required>
     </div>
-    <input class="btn btn-primary btn-block" type="Submit" name="auth-submit" value="Log In">
+    <input class="btn btn-primary btn-block" type="Submit" name="action" value="Log In">
 </form>
     <a class="redirect-link" href="{{url_for('auth', action='signup')}}">Don't Have an Account? Sign Up.</a> <br>
     <a class="redirect-link" href="#" data-toggle="modal" data-target="#forgotPass" id="forgotPassBtn">Forgot Password?</a>
@@ -91,8 +92,8 @@
         <label for="signup-confirm-pass">Confirm Password:</label>
         <input class="form-control" type="password" id='signup-confirm-pass' name="confirm-password" placeholder="Enter password again" minlength="8" maxlength="20" autocomplete="off" required>
     </div>
-    <input class="btn btn-primary btn-block" type="Submit" id='signup-student' name="auth-submit" value="Sign Up as Student" disabled> <br>
-    <input class="btn btn-primary btn-block" type="Submit" id='signup-teacher' name="auth-submit" value="Sign Up as Teacher" disabled>
+    <input class="btn btn-primary btn-block" type="Submit" id='signup-student' name="action" value="Sign Up as Student" disabled> <br>
+    <input class="btn btn-primary btn-block" type="Submit" id='signup-teacher' name="action" value="Sign Up as Teacher" disabled>
 </form>
     <a class="redirect-link" href="{{url_for('auth', action='login')}}">Already have an account? Log In.</a>
 </div>
@@ -129,7 +130,7 @@
                 <label class="text-body" for="signup-f_name">Email:</label>
                 <input class="form-control" type="email" id="forgot-password-email" name="forgot-pass-email" placeholder="Enter email" autocomplete="off" required>
             </div>
-            <input class="btn btn-primary btn-block" type="Submit" id='forgot-pass-submit' name="auth-submit" value="Send Password Reset Email">
+            <input class="btn btn-primary btn-block" type="Submit" id='forgot-pass-submit' value="Send Password Reset Email">
         </form>
       </div>
 
