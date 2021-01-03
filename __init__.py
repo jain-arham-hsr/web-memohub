@@ -1,6 +1,7 @@
 from flask import Flask
 
-from memohub.helpers import LazyView
+# noinspection PyPackageRequirements,PyUnresolvedReferences
+from helpers import LazyView
 
 app = Flask(__name__)
 
