@@ -56,6 +56,7 @@ def auth_verification():
             # noinspection PyBroadException
             try:
                 Firebase.signup(f_name, l_name, email, password, user_category)
+                session['error_msg'] = "Sign up successful! Please verify your email via the link sent to your inbox."
                 return redirect(url_for('auth', action="login"))
             except Exception as e:
                 session['error_msg'] = str(e)

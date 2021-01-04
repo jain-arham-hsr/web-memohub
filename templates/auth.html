@@ -45,8 +45,8 @@
 <div class="centered" id="login">
 <h1 id="login-head">Login</h1>
     {% if error_msg %}
-        <div class="alert alert-danger">
-            <strong>Oops!</strong> {{error_msg}}
+        <div class="alert alert-warning">
+            {{error_msg}}
         </div>
     {% endif %}
 <form action="{{url_for('auth_verification')}}" method="POST">

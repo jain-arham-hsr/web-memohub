@@ -48,7 +48,6 @@ class Firebase:
                                  data=payload).json()
         try:
             id_token = response['idToken']
-            print(id_token)
             local_id = response['localId']
             self.update_profile(id_token, f"{f_name} {l_name}")
             self.send_verification_email(id_token)
@@ -59,7 +58,6 @@ class Firebase:
             })
             check_for_pending_invitations(local_id, email, user_cat)
         except:
-            print(response['error']['message'])
             raise Exception(response['error']['message'])
 
     def login(self, email, password):
@@ -76,12 +74,13 @@ class Firebase:
             id_token = response['idToken']
             user_data = self.get_user_data(id_token)['users'][0]
             email_verified = user_data["emailVerified"]
-            if email_verified:
-                return user_data['localId'], user_data['displayName']
-            else:
-                self.send_verification_email(id_token)
         except:
             raise Exception(response['error']['message'])
+        if email_verified:
+            return user_data['localId'], user_data['displayName']
+        else:
+            self.send_verification_email(id_token)
+            raise Exception("Email not verified yet. Please check your Inbox for verification email.")
 
     def get_user_data(self, id_token):
         endpoint = "https://identitytoolkit.googleapis.com/v1/accounts:lookup"
@@ -204,12 +203,11 @@ def login_required(f):
 
 def set_theme():
     session['profile_data']['theme'] = ast.literal_eval(config("THEME"))[Firebase.retrieve_data(f"users/{session.get('uid')}/theme")]
-    print(session['profile_data']['theme'])
 
 
 def check_for_pending_invitations(uid, email, user_cat):
     formatted_email = format_email(email)
-    if formatted_email in Firebase.retrieve_data('pendingInvitation').keys():
+    if formatted_email in (Firebase.retrieve_data('pendingInvitation') or {}).keys():
         pending_batch_invitations = Firebase.retrieve_data(f'pendingInvitation/{formatted_email}')
         # noinspection PyTypeChecker
         for invitation in pending_batch_invitations:
