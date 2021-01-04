@@ -34,8 +34,8 @@ def auth_verification():
             # noinspection PyBroadException
             try:
                 uid, display_name = Firebase.login(email, password)
-            except Exception:
-                session['error_msg'] = Exception
+            except Exception as e:
+                session['error_msg'] = str(e)
                 return redirect(url_for('auth', action="login"))
             session['uid'] = uid
             session['display_name'] = display_name
@@ -57,8 +57,8 @@ def auth_verification():
             try:
                 Firebase.signup(f_name, l_name, email, password, user_category)
                 return redirect(url_for('auth', action="login"))
-            except Exception:
-                session['error_msg'] = Exception
+            except Exception as e:
+                session['error_msg'] = str(e)
                 return redirect(url_for('auth', action="signup"))
     set_theme()
     return render_template('404.html')
@@ -69,8 +69,8 @@ def reset_password():
         # noinspection PyBroadException
         try:
             Firebase.send_password_reset_email(request.form['forgot-pass-email'])
-        except Exception:
-            session['error_msg'] = Exception
+        except Exception as e:
+            session['error_msg'] = str(e)
         return redirect(url_for('logout'))
     set_theme()
     return render_template('404.html')

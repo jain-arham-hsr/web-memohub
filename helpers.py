@@ -35,7 +35,7 @@ class Firebase:
             cred = credentials.Certificate("serviceAccountKey.json")
             initialize_app(cred, {"databaseURL": "https://project-aa-e98db-default-rtdb.firebaseio.com",
                                   "storageBucket": "project-aa-e98db.appspot.com"})
-        self._FIREBASE_WEB_API_KEY = config("FIREBASE_WEB_API_KEY")
+        self.FIREBASE_WEB_API_KEY = config("FIREBASE_WEB_API_KEY")
 
     def signup(self, f_name, l_name, email, password, user_cat):
         endpoint = "https://identitytoolkit.googleapis.com/v1/accounts:signUp"
@@ -44,10 +44,11 @@ class Firebase:
             "password": password
         })
         response = requests.post(endpoint,
-                                 params={"key": self._FIREBASE_WEB_API_KEY},
+                                 params={"key": self.FIREBASE_WEB_API_KEY},
                                  data=payload).json()
         try:
             id_token = response['idToken']
+            print(id_token)
             local_id = response['localId']
             self.update_profile(id_token, f"{f_name} {l_name}")
             self.send_verification_email(id_token)
@@ -58,6 +59,7 @@ class Firebase:
             })
             check_for_pending_invitations(local_id, email, user_cat)
         except:
+            print(response['error']['message'])
             raise Exception(response['error']['message'])
 
     def login(self, email, password):
@@ -68,7 +70,7 @@ class Firebase:
             "returnSecureToken": True
         })
         response = requests.post(endpoint,
-                                 params={"key": self._FIREBASE_WEB_API_KEY},
+                                 params={"key": self.FIREBASE_WEB_API_KEY},
                                  data=payload).json()
         try:
             id_token = response['idToken']
@@ -87,7 +89,7 @@ class Firebase:
             "idToken": id_token,
         })
         response = requests.post(endpoint,
-                                 params={"key": self._FIREBASE_WEB_API_KEY},
+                                 params={"key": self.FIREBASE_WEB_API_KEY},
                                  data=payload).json()
         return response
 
@@ -109,7 +111,7 @@ class Firebase:
             "returnSecureToken": True
         })
         requests.post(endpoint,
-                      params={"key": self._FIREBASE_WEB_API_KEY},
+                      params={"key": self.FIREBASE_WEB_API_KEY},
                       data=payload)
 
     def send_password_reset_email(self, email):
@@ -119,7 +121,7 @@ class Firebase:
             "email": email
         })
         response = requests.post(endpoint,
-                                 params={"key": self._FIREBASE_WEB_API_KEY},
+                                 params={"key": self.FIREBASE_WEB_API_KEY},
                                  data=payload).json()
         if 'error' in response.keys():
             raise Exception(response['error']['message'])
@@ -131,7 +133,7 @@ class Firebase:
             "idToken": id_token
         })
         requests.post(endpoint,
-                      params={"key": self._FIREBASE_WEB_API_KEY},
+                      params={"key": self.FIREBASE_WEB_API_KEY},
                       data=payload)
 
     @staticmethod
@@ -202,6 +204,7 @@ def login_required(f):
 
 def set_theme():
     session['profile_data']['theme'] = ast.literal_eval(config("THEME"))[Firebase.retrieve_data(f"users/{session.get('uid')}/theme")]
+    print(session['profile_data']['theme'])
 
 
 def check_for_pending_invitations(uid, email, user_cat):
