@@ -20,7 +20,7 @@
     console.log('outside up')
     var socket_url;
     /* socket_url = "http://localhost:5000" */
-    socket_url = io.connect('https://' + document.domain + ':' + location.port);
+    socket_url = io.connect('https://' + document.domain + ':' + location.port, {transports: ['websocket']});
     const socket = io.connect(socket_url);
     var joined_room = false;
     socket.on('connect', function () {
