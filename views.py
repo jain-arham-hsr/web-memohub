@@ -1,13 +1,10 @@
-from flask import session, request, render_template, redirect, url_for, flash
+from flask import session, request, render_template, redirect, url_for, flash, get_flashed_messages
 # noinspection PyProtectedMember
 from firebase_admin._auth_utils import UserNotFoundError
-from werkzeug.utils import secure_filename
 from datetime import datetime
-from decouple import config
-import ast
 
 # noinspection PyPackageRequirements,PyUnresolvedReferences
-from helpers import login_required, Firebase, Memohub, set_theme, validate_duplicate_batches, validate_file_format, format_email
+from helpers import login_required, Firebase, Memohub, set_theme, validate_duplicate_batches, format_email
 
 
 Firebase = Firebase()
@@ -154,14 +151,14 @@ def add_participant():
                 cat = Firebase.retrieve_data(f'users/{user_data.uid}/category')
                 Firebase.append_data(f'users/{user_data.uid}/batches', f"batch_{batch_id}")
                 Firebase.append_data(f'batches/batch_{batch_id}/participants', (request.form['email'], cat))
-                Memohub.send_text_msg(batch_id, "MemoHub", f"'{user_data.display_name}' added to this batch.")
+                Memohub.save_text_msg(batch_id, "MemoHub", f"'{user_data.display_name}' added to this batch.")
             else:
                 session['error_msg'] = "User already enrolled in this batch. Please enter email of some other user."
         except UserNotFoundError:
             if f"batch_{batch_id}" not in (Firebase.retrieve_data(f"pendingInvitation/{format_email(email)}") or []):
                 Firebase.append_data(f"pendingInvitation/{format_email(email)}", f"batch_{batch_id}")
                 Firebase.append_data(f'batches/batch_{batch_id}/participants', (request.form['email'], 'undefined'))
-                Memohub.send_text_msg(batch_id, "MemoHub", f"'{email}' added to this batch.")
+                Memohub.save_text_msg(batch_id, "MemoHub", f"'{email}' added to this batch.")
             else:
                 session['error_msg'] = "User already enrolled in this batch. Please enter email of some other user."
         except ValueError:
@@ -175,14 +172,14 @@ def remove_participant():
     if request.method == 'POST':
         email, cat = request.form['participant'].split(',')
         batch_id = session.get('last_batch_opened', None)
+        Firebase.remove_list_item(f'batches/batch_{batch_id}/participants', [email, cat])
         try:
             user_data = Firebase.get_user_by_email(email)
             Firebase.remove_list_item(f'users/{user_data.uid}/batches', f'batch_{batch_id}')
-            Memohub.send_text_msg(batch_id, "MemoHub", f"'{user_data.display_name}' removed from this batch.")
+            Memohub.save_text_msg(batch_id, "MemoHub", f"'{user_data.display_name}' removed from this batch.")
         except UserNotFoundError:
             Firebase.remove_list_item(f'pendingInvitation/{format_email(email)}', f'batch_{batch_id}')
-            Memohub.send_text_msg(batch_id, "MemoHub", f"'{email}' removed from this batch.")
-        Firebase.remove_list_item(f'batches/batch_{batch_id}/participants', [email, cat])
+            Memohub.save_text_msg(batch_id, "MemoHub", f"'{email}' removed from this batch.")
         return redirect(url_for('batch', batch_id=batch_id))
     set_theme()
     return render_template('404.html')
@@ -203,35 +200,6 @@ def remove_batch():
         uid = session.get('uid', None)
         Firebase.remove_list_item(f'users/{uid}/batches', f'batch_{batch_id}')
         return redirect(url_for('home'))
-    set_theme()
-    return render_template('404.html')
-
-
-def send_text_msg():
-    if request.method == 'POST':
-        batch_id = session.get('last_batch_opened')
-        Memohub.send_text_msg(batch_id, session.get('display_name'), request.form['msg'])
-        return redirect(url_for('batch', batch_id=batch_id))
-    set_theme()
-    return render_template('404.html')
-
-
-def send_attach_msg():
-    if request.method == 'POST':
-        batch_id = session.get('last_batch_opened')
-        files = request.files.getlist("files")
-        for file in files:
-            if validate_file_format(file.filename):
-                sender = session.get('display_name')
-                file_id = datetime.now().strftime("%Y%m%d%H%M%S%f%z")
-                file_url = Firebase.upload_file_to_storage(file,
-                                                           f"file_{file_id}.{secure_filename(file.filename).rsplit('.', 1)[1].lower()}",
-                                                           ast.literal_eval(config("ALLOWED_EXTENSIONS"))[secure_filename(file.filename).rsplit('.', 1)[1].lower()])
-                topic = file.filename
-                Memohub.send_attach_msg(batch_id, sender, topic, file_url)
-            else:
-                flash(f"Could not upload {file.filename} due to invalid file type")
-        return redirect(url_for('batch', batch_id=batch_id))
     set_theme()
     return render_template('404.html')
 

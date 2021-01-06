@@ -8,8 +8,8 @@ from werkzeug.utils import import_string, cached_property
 from functools import wraps
 from decouple import config
 
-# noinspection PyProtectedMember
-from firebase_admin import credentials, initialize_app, storage, _apps, db, auth
+from firebase_admin import credentials, initialize_app, storage, db, auth
+import firebase_admin
 
 
 class LazyView(object):
@@ -31,7 +31,8 @@ class Firebase:
     default_profile_photo = "https://storage.googleapis.com/project-aa-e98db.appspot.com/defaultProfile"
 
     def __init__(self):
-        if not _apps:
+        # noinspection PyProtectedMember
+        if not firebase_admin._apps:
             cred = credentials.Certificate("serviceAccountKey.json")
             initialize_app(cred, {"databaseURL": "https://project-aa-e98db-default-rtdb.firebaseio.com",
                                   "storageBucket": "project-aa-e98db.appspot.com"})
@@ -172,7 +173,7 @@ class Firebase:
 class Memohub:
 
     @staticmethod
-    def send_text_msg(batch_id, sender, msg):
+    def save_text_msg(batch_id, sender, msg):
         Firebase.append_data(f'batches/batch_{batch_id}/messages', {
             'timestamp': datetime.now().strftime("%H:%M %B %d, %Y"),
             'type': 'text',
@@ -181,7 +182,7 @@ class Memohub:
         })
 
     @staticmethod
-    def send_attach_msg(batch_id, sender, topic, file_url):
+    def save_attach_msg(batch_id, sender, topic, file_url):
         Firebase.append_data(f'batches/batch_{batch_id}/messages', {
             'timestamp': datetime.now().strftime("%H:%M %B %d, %Y"),
             'type': 'file',

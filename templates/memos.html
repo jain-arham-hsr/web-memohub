@@ -16,12 +16,29 @@
   {% endif %}
 {% endwith %}
 
+<script>
+    console.log('outside up')
+    var socket_url;
+    socket_url = "http://localhost:5000"
+    /* socket_url = "https://memohub.herokuapp.com" */
+    const socket = io.connect(socket_url);
+    var joined_room = false;
+    socket.on('connect', function () {
+        if (!joined_room) {
+            socket.emit('join_room');
+            joined_room = true;
+            console.log('inside')
+        }
+    });
+    console.log('outside down')
+</script>
+
 {% if batch_data.active %}
 
 <div class="row full-page-container">
     <div id="msg-display-col" class="col-sm-8">
         <div id="msg-display">
-        <ul style="margin-left: -39px;">
+        <ul id="msg-display-list" style="margin-left: -39px;">
             {% for msg in batch_data.messages|reverse %}
                 <li>
                     {% if msg.type == 'text' %}
@@ -57,6 +74,45 @@
             msg_display_col.className = msg_display_col.className.replace("col-sm-8", "col-sm-12");
         };
 	</script>
+    <script>
+        const msg_list = document.getElementById("msg-display-list")
+        socket.on('receive_text_msg', function (data) {
+            const newNode = document.createElement('li');
+            newNode.innerHTML = `
+                <div class="card {{profile_data['theme']['cards']}} text-message-memo">
+                    <div class="card-body">
+                        <b style="margin-top:-2px;">${data.sender}</b>
+                        <p style="margin-bottom:-1px;margin-top:10px;">${data.msg}</p>
+                    </div>
+                </div>
+                <br>`;
+            msg_list.insertBefore(newNode, msg_list.firstChild);
+        });
+        socket.on('receive_attach_msg', function (data) {
+            console.log(data);
+            data.forEach((file) => {
+                const newNode = document.createElement('li');
+                newNode.innerHTML = `
+                    <div class="card {{profile_data['theme']['cards']}} text-message-memo">
+                        <div class="card-body">
+                            <div class="card-details">
+                                <h5 style="margin-top:-2px;">${file.topic}</h5>
+                                <p style="margin-bottom:-1px;margin-top:10px;">Sent by: ${file.sender}</p>
+                            </div>
+                            <div class="file-action-btn" id="file-action-btn">
+                                <a class="btn {{profile_data['theme']['buttons']}}" href="${file.file_url}" target="_blank">Open/Download</a>
+                            </div>
+                        </div>
+                    </div>
+                    <br>`;
+                msg_list.insertBefore(newNode, msg_list.firstChild);
+                {% if cat == 'teacher' %}
+                    send_files_btn.disabled = false;
+                    send_files_btn.innerHTML = "Send";
+                {% endif %}
+            });
+        });
+    </script>
     {% if cat == 'teacher' %}
         <div id="send-card" class="card {{profile_data['theme']['cards']}}">
             <div class="card-body">
@@ -66,17 +122,36 @@
                         <option value="Text" selected="selected">Text</option>
                         <option value="File Upload">File Upload</option>
                     </select>
-                    <form class="form-inline"  id="send-text-message-form" action="{{url_for('send_text_msg')}}" method="POST">
+                    <form class="form-inline"  id="send-text-message-form" method="POST">
                         <textarea class="form-control" rows="1" id="send-text-msg-input" name="msg" placeholder="Enter message..." autocomplete="off" required></textarea>
                         <input class="btn {{profile_data['theme']['buttons']}}" type="submit" value="Send">
                     </form>
-                    <form class="form-inline"  id="send-attach-message-form" action="{{url_for('send_attach_msg')}}" enctype="multipart/form-data" method="POST">
+                    <form class="form-inline"  id="send-attach-message-form" enctype="multipart/form-data" action="{{url_for('send_attach_msg')}}" method="POST">
                         <input class="form-control-file" id="file-input-memos" type="file" name="files" autocomplete="off" multiple="multiple" required>
-                        <input class="btn {{profile_data['theme']['buttons']}} btn-block" style="margin-top:7px;" type="submit" value="Send">
+                        <button class="btn {{profile_data['theme']['buttons']}} btn-block" id="send-attach-msg-btn" style="margin-top:7px;" type="submit">Send</button>
                     </form>
                 </div>
             </div>
         </div>
+        <script>
+            document.getElementById('send-text-message-form').onsubmit = function (e) {
+                e.preventDefault();
+                let text_msg_input = document.getElementById('send-text-msg-input')
+                let message = text_msg_input.value.trimEnd().replace(/(?:\r\n|\r|\n)/g, '<br />');;
+                if (message.length) {
+                    socket.emit('send_text_msg', {
+                        message: message
+                    })
+                }
+                text_msg_input.value = '';
+                text_msg_input.focus();
+            }
+            const send_files_btn = document.getElementById("send-attach-msg-btn")
+            document.getElementById('send-attach-message-form').onsubmit = function (e) {
+                send_files_btn.disabled = true;
+                send_files_btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>&nbsp;Loading...'
+            }
+        </script>
         <script>
             msg_type_selection = document.getElementById('msg-type')
             msg_type_selection.onchange = function() {
