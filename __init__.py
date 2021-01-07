@@ -1,5 +1,6 @@
 from flask import Flask, session, request, redirect, url_for
 from flask_socketio import SocketIO, join_room
+from flask_talisman import Talisman
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from decouple import config
@@ -12,7 +13,7 @@ app = Flask(__name__)
 app.config.from_object('config.BaseConfig')
 
 socket_io = SocketIO(app)
-
+talisman = Talisman(app)
 
 app.add_url_rule('/',
                  view_func=LazyView('views.home'))
