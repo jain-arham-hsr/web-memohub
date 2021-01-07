@@ -4,7 +4,7 @@ from firebase_admin._auth_utils import UserNotFoundError
 from datetime import datetime
 
 # noinspection PyPackageRequirements,PyUnresolvedReferences
-from helpers import login_required, Firebase, Memohub, set_theme, validate_duplicate_batches, format_email
+from helpers import login_required, ssl_required, Firebase, Memohub, set_theme, validate_duplicate_batches, format_email
 
 
 Firebase = Firebase()
