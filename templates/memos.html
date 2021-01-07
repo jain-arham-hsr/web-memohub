@@ -109,7 +109,7 @@
             {% endfor %}
         </ul>
         </div>
-        <div id="doubts-section" >
+        <div id="doubts-section">
             {% if cat == 'student' %}
                 <button type="button" id="ask-ques-btn" data-toggle="modal" data-target="#queryModal" class="btn {{profile_data['theme']['buttons']}} btn-block m3">Ask a Query</button>
             {% endif %}
@@ -196,7 +196,7 @@
                 {% if cat == 'teacher' %}
                     const sendCard = document.getElementById("send-card");
                     if (sendCard) {
-                        sendCard.style.display = "block";
+                        sendCard.style.display = "none";
                     }
                 {% endif %}
             }
