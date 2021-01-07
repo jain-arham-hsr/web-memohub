@@ -10,7 +10,6 @@ from helpers import login_required, ssl_required, Firebase, Memohub, set_theme, 
 Firebase = Firebase()
 
 
-@ssl_required
 def home():
     if session.get('uid', None):
         return redirect(url_for('dashboard'))

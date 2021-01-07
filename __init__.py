@@ -1,6 +1,5 @@
 from flask import Flask, session, request, redirect, url_for
 from flask_socketio import SocketIO, join_room
-from flask_talisman import Talisman
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from decouple import config
@@ -10,7 +9,6 @@ import ast
 from helpers import LazyView, Firebase, Memohub, validate_file_format
 
 app = Flask(__name__)
-Talisman(app)
 app.config.from_object('config.BaseConfig')
 
 socket_io = SocketIO(app)
