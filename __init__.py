@@ -76,7 +76,9 @@ def handle_send_text_msg_event(data):
     display_name = session.get('display_name')
     msg = data['message']
     Memohub.save_text_msg(batch_id, display_name, msg)
+    timestamp = datetime.now().strftime("%H:%M %B %d, %Y")
     payload = {
+        'timestamp': timestamp,
         'sender': display_name,
         'msg': msg
     }
@@ -101,7 +103,9 @@ def send_attach_msg():
                                                            content_type)
                 topic = file.filename
                 Memohub.save_attach_msg(batch_id, sender, topic, file_url)
+                timestamp = datetime.now().strftime("%H:%M %B %d, %Y")
                 upload_data = {
+                    'timestamp': timestamp,
                     'sender': display_name,
                     'topic': topic,
                     'file_url': file_url

@@ -281,6 +281,7 @@
                     <div class="card-body">
                         <b style="margin-top:-2px;">${data.sender}</b>
                         <p style="margin-bottom:-1px;margin-top:10px;">${data.msg}</p>
+                        <p class="timestamp"><small>${data.timestamp}</small></p>
                     </div>
                 </div>
                 <br>`;
@@ -299,6 +300,7 @@
                             <div class="file-action-btn" id="file-action-btn">
                                 <a class="btn {{profile_data['theme']['buttons']}}" href="${file.file_url}" target="_blank">Open/Download</a>
                             </div>
+                            <p class="timestamp"><small>${data.timestamp}</small></p>
                         </div>
                     </div>
                     <br>`;
