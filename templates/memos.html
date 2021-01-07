@@ -182,9 +182,9 @@
                 study_tab.classList.add("active")
                 doubts_tab.classList.remove("active")
                 {% if cat == 'teacher' %}
-                    const send-card = document.getElementById("send-card");
-                    if send-card() {
-                        send-card.style.display = "block";
+                    const sendCard = document.getElementById("send-card");
+                    if (sendCard) {
+                        sendCard.style.display = "block";
                     }
                 {% endif %}
             }
@@ -194,9 +194,9 @@
                 study_tab.classList.remove("active")
                 doubts_tab.classList.add("active")
                 {% if cat == 'teacher' %}
-                    const send-card = document.getElementById("send-card");
-                    if send-card() {
-                        send-card.style.display = "block";
+                    const sendCard = document.getElementById("send-card");
+                    if (sendCard) {
+                        sendCard.style.display = "block";
                     }
                 {% endif %}
             }
