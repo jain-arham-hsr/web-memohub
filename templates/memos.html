@@ -17,9 +17,7 @@
 {% endwith %}
 
 <script>
-    console.log('outside up')
     var socket_url;
-    /* socket_url = "http://localhost:5000" */
     socket_url = 'https://' + document.domain + ':' + location.port;
     const socket = io.connect(socket_url, {transports: ['websocket']});
     var joined_room = false;
@@ -27,16 +25,61 @@
         if (!joined_room) {
             socket.emit('join_room');
             joined_room = true;
-            console.log('inside')
         }
     });
-    console.log('outside down')
 </script>
 
-{% if batch_data.active %}
+{% if batch_data.active|safe %}
+
+<div class="modal fade" id="queryModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Ask a Question</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <!-- Modal body -->
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="query">Question:</label>
+            <textarea class="form-control" rows="5" id="query"></textarea>
+          </div>
+        </div>
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" onclick="postQuery()" class="btn {{profile_data['theme']['buttons']}}" data-dismiss="modal">Post Query</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+<script>
+    function postQuery() {
+        let msg_input = document.getElementById("query")
+        let message = msg_input.value.trimEnd().replace(/(?:\r\n|\r|\n)/g, '<br />');
+        if (message.length) {
+            socket.emit('post_query', {
+                query: message
+            });
+            console.log(message);
+        }
+        msg_input.value = '';
+        msg_input.focus();
+    }
+</script>
+
 
 <div class="row full-page-container">
     <div id="msg-display-col" class="col-sm-8">
+        <ul class="nav nav-tabs nav-justified">
+            <li class="nav-item">
+              <a id="study-tab-link" class="nav-link active" href="javascript:study_mode()">Study Material</a>
+            </li>
+            <li class="nav-item">
+              <a id="doubts-tab-link" class="nav-link" href="javascript:doubts_mode()">Doubts</a>
+            </li>
+        </ul>
         <div id="msg-display">
         <ul id="msg-display-list" style="margin-left: -39px;">
             {% for msg in batch_data.messages|reverse %}
@@ -65,7 +108,146 @@
                 </li>
             {% endfor %}
         </ul>
-    </div>
+        </div>
+        <div id="doubts-section" >
+            {% if cat == 'student' %}
+                <button type="button" id="ask-ques-btn" data-toggle="modal" data-target="#queryModal" class="btn {{profile_data['theme']['buttons']}} btn-block m3">Ask a Query</button>
+            {% endif %}
+            <ul id="doubts">
+            {% if batch_data.threads %}
+                <script>const batch_data = {{batch_data.threads | safe}}</script>
+            {% for thread in batch_data.threads | reverse %}
+                <script>console.log({{thread | safe}})</script>
+            <li>
+             <div class="card {{profile_data['theme']['cards']}} text-message-memo">
+                <div class="card-body">
+                    <div class="media p-3">
+                        <img src="{{thread.profile_img}}" alt="{{thread.author}}" class="mr-3 mt-3 rounded-circle" style="width:60px;">
+                        <div class="media-body">
+                            <h5>{{thread.author}} <small><i>{{thread.timestamp}}</i></small></h5>
+                            <p>{{thread.query}}</p>
+                            {% if thread.sub_threads %}
+                            {% for sub_thread in thread.sub_threads %}
+                            <div class="media p-3">
+                                <img src="{{sub_thread.profile_img}}" alt="{{sub_thread.author}}" class="mr-3 mt-3 rounded-circle" style="width:45px;">
+                                <div class="media-body">
+                                    <h5>{{sub_thread.author}} <small><i>{{sub_thread.timestamp}}</i></small></h5>
+                                    <p>{{sub_thread.msg}}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% endif %}
+                            <form class="reply-form" id="reply_form_{{loop.index}}">
+                                <textarea class="form-control reply-thread-msg-input" rows="1" name="reply_msg" placeholder="Enter message..." autocomplete="off" required></textarea>
+                                <button class="btn {{profile_data['theme']['buttons']}}" type="submit">Reply</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+             </div>
+            </li>
+            <br />
+            {% endfor %}
+            {% endif %}
+            </ul>
+            <script>
+                replyForms = document.querySelectorAll("form.reply-form");
+                replyForms.forEach((form) => {
+                    form.onsubmit = function (e) {
+                        e.preventDefault()
+                        let msg_input = form.querySelector("textarea")
+                        let message = msg_input.value.trimEnd().replace(/(?:\r\n|\r|\n)/g, '<br />');
+                        const doubts = document.getElementById("doubts")
+                        const thread = doubts.querySelectorAll("li").length - parseInt(form.id.replace("reply_form_", ''));
+                        if (message.length) {
+                            socket.emit('send_reply', {
+                                thread: thread,
+                                message: message
+                            })
+                        }
+                        msg_input.value = '';
+                        msg_input.focus();
+                    }
+                });
+            </script>
+        </div>
+        <script>
+            doubts = document.getElementById("doubts-section");
+            doubts_tab = document.getElementById("doubts-tab-link")
+            study_material = document.getElementById("msg-display")
+            study_tab = document.getElementById("study-tab-link")
+            study_mode = function () {
+                study_material.style.display = "block";
+                doubts.style.display = "none";
+                study_tab.classList.add("active")
+                doubts_tab.classList.remove("active")
+                {% if cat == 'teacher' %}
+                    window.onload = function() {
+                        document.getElementById("send-card").style.display = "block";
+                    }
+                {% endif %}
+            }
+            doubts_mode = function () {
+                study_material.style.display = "none";
+                doubts.style.display = "block";
+                study_tab.classList.remove("active")
+                doubts_tab.classList.add("active")
+                {% if cat == 'teacher' %}
+                    window.onload = function() {
+                        document.getElementById("send-card").style.display = "none";
+                    }
+                {% endif %}
+            }
+            study_mode()
+        </script>
+        <script>
+            const doubt_list = document.getElementById("doubts");
+            socket.on('receive_query', function (data) {
+                console.log(data);
+                const newNode = document.createElement('li');
+                const allNodes = doubt_list.querySelector("li");
+                let containerLength = 0;
+                if (allNodes) {
+                    containerLength = allNodes.length;
+                }
+                newNode.innerHTML = `
+                    <div class="card {{profile_data['theme']['cards']}} text-message-memo">
+                        <div class="card-body">
+                            <div class="media p-3">
+                                <img src="${data.profile_img}" alt="${data.author}" class="mr-3 mt-3 rounded-circle" style="width:60px;">
+                                <div class="media-body">
+                                    <h5>${data.author} <small><i>${data.timestamp}</i></small></h5>
+                                    <p>${data.query}</p>
+                                    <form class="reply-form" id="reply_form_${toString(containerLength)}">
+                                        <textarea class="form-control reply-thread-msg-input" rows="1" name="reply_msg" placeholder="Enter message..." autocomplete="off" required></textarea>
+                                        <button class="btn {{profile_data['theme']['buttons']}}" type="submit">Reply</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>`;
+
+                doubt_list.insertBefore(newNode, doubt_list.firstChild);
+            });
+            socket.on('receive_reply', function (data) {
+                console.log(data);
+                const newNode = document.createElement('div');
+                newNode.classList.add("media");
+                newNode.classList.add("p-3");
+                newNode.innerHTML = `
+                    <img src="${data.profile_img}" alt="${data.author}" class="mr-3 mt-3 rounded-circle" style="width:45px;">
+                    <div class="media-body">
+                        <h5>${data.author} <small><i>${data.timestamp}</i></small></h5>
+                        <p>${data.reply}</p>
+                    </div>
+                    <br>`;
+                const thread_no = doubts.querySelectorAll("li").length - data.thread;
+                const container = doubts.querySelectorAll("li")[thread_no - 1].querySelector(".media-body");
+                const form = container.querySelector("#reply_form_" + thread_no);
+                container.insertBefore(newNode, form);
+            });
+        </script>
 	<script>
         var user_cat = '{{cat | safe}}';
         if (user_cat == 'student') {
@@ -89,7 +271,6 @@
             msg_list.insertBefore(newNode, msg_list.firstChild);
         });
         socket.on('receive_attach_msg', function (data) {
-            console.log(data);
             data.forEach((file) => {
                 const newNode = document.createElement('li');
                 newNode.innerHTML = `
@@ -187,7 +368,7 @@
                     <script>
                         function deleteParticipant(participant) {
                             if (confirm(`Delete ${participant[0]} from this batch?`)) {
-                                post('{{url_for('remove_participant')}}', {'participant': participant})
+                                post("{{url_for('remove_participant')}}", {'participant': participant})
                             }
                         }
                     </script>

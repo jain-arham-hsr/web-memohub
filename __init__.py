@@ -37,6 +37,8 @@ app.add_url_rule('/addParticipant',
 app.add_url_rule('/removeParticipant',
                  view_func=LazyView('views.remove_participant'),
                  methods=['POST'])
+app.add_url_rule('/threads/',
+                 view_func=LazyView('views.threads'))
 app.add_url_rule('/deleteBatch',
                  view_func=LazyView('views.delete_batch'),
                  methods=['POST'])
@@ -79,7 +81,6 @@ def send_attach_msg():
         files = request.files.getlist("files")
         payload = []
         for file in files:
-            print(file.filename)
             if validate_file_format(file.filename):
                 sender = session.get('display_name')
                 content_type = ast.literal_eval(config("ALLOWED_EXTENSIONS"))[
@@ -96,13 +97,49 @@ def send_attach_msg():
                     'file_url': file_url
                 }
                 payload.append(upload_data)
-                print(payload)
             else:
                 flash(f"Could not upload {file.filename} due to invalid file type")
         socket_io.emit('receive_attach_msg', payload, room=batch_id)
-        print(payload)
         return redirect(url_for('batch', batch_id=batch_id))
     return render_template('404.html')
+
+
+@socket_io.on('post_query')
+def handle_post_query(data):
+    batch_id = session.get('last_batch_opened')
+    sender = session.get('display_name')
+    query = data['query']
+    # only for testing purposes
+    profile_img = "https://firebasestorage.googleapis.com/v0/b/project-aa-e98db.appspot.com/o/profileImage.jpg?alt=media&token=6dc5a27f-7bdd-49e8-ba8e-bfd5f61237b1"
+    Memohub.save_query(batch_id, sender, query, profile_img)
+    timestamp = datetime.now().strftime("%H:%M %B %d, %Y")
+    payload = {
+        'timestamp': timestamp,
+        'author': sender,
+        'query': query,
+        'profile_img': profile_img
+    }
+    socket_io.emit('receive_query', payload, room=batch_id)
+
+
+@socket_io.on('send_reply')
+def handle_send_reply(data):
+    batch_id = session.get('last_batch_opened')
+    sender = session.get('display_name')
+    reply = data['message']
+    thread = data['thread']
+    # only for testing purposes
+    profile_img = "https://firebasestorage.googleapis.com/v0/b/project-aa-e98db.appspot.com/o/profileImage.jpg?alt=media&token=6dc5a27f-7bdd-49e8-ba8e-bfd5f61237b1"
+    Memohub.save_reply(batch_id, sender, reply, profile_img, thread)
+    timestamp = datetime.now().strftime("%H:%M %B %d, %Y")
+    payload = {
+        'timestamp': timestamp,
+        'author': sender,
+        'reply': reply,
+        'profile_img': profile_img,
+        'thread': thread
+    }
+    socket_io.emit('receive_reply', payload, room=batch_id)
 
 
 # Runs App

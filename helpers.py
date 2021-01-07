@@ -190,6 +190,26 @@ class Memohub:
             'value': [topic, file_url]
         })
 
+    @staticmethod
+    def save_query(batch_id, sender, query, profile_img):
+        Firebase.append_data(f'batches/batch_{batch_id}/threads', {
+            'timestamp': datetime.now().strftime("%H:%M %B %d, %Y"),
+            'author': sender,
+            'profile_img': profile_img,
+            'query': query,
+        })
+
+    @staticmethod
+    def save_reply(batch_id, sender, msg, profile_img, thread):
+        Firebase.append_data(f'batches/batch_{batch_id}/threads/{thread}/sub_threads', {
+            'timestamp': datetime.now().strftime("%H:%M %B %d, %Y"),
+            'author': sender,
+            'profile_img': profile_img,
+            'msg': msg
+        })
+
+
+
 
 # login required decorator function
 def login_required(f):

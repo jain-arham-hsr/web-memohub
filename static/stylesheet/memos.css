@@ -21,7 +21,8 @@
 
 #msg-display {
     padding-right: 15px;
-    height: 451px;
+    height: 398px;
+    margin-top: 10px;
     overflow: auto;
 }
 
@@ -111,4 +112,28 @@
 #deleted-batch-msg {
     text-align: center;
     margin-top: 16%;
+}
+
+#ask-ques-btn {
+    margin-top: 13px;
+}
+
+#doubts-section {
+    margin-top: 10px;
+    height: 487px;
+    overflow: auto;
+    padding-right: 5px;
+}
+
+#doubts {
+    list-style-type: none;
+    margin-top: 10px;
+}
+
+.reply-form {
+    display: flex;
+}
+
+.reply-form textarea {
+    margin-right: 5px;
 }
