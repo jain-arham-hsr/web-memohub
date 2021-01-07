@@ -72,7 +72,7 @@
 
 <div class="row full-page-container">
     <div id="msg-display-col" class="col-sm-8">
-        <ul class="nav nav-tabs nav-justified">
+        <ul class="nav nav-tabs nav-justified" id="nav-tabs-select-mode">
             <li class="nav-item">
               <a id="study-tab-link" class="nav-link active" href="javascript:study_mode()">Study Material</a>
             </li>
@@ -80,6 +80,14 @@
               <a id="doubts-tab-link" class="nav-link" href="javascript:doubts_mode()">Doubts</a>
             </li>
         </ul>
+        <script>
+            if ("{{profile_data['theme']['theme_name']}}" == 'dark') {
+                const study_tab = document.getElementById("study-tab-link");
+                const doubts_tab = document.getElementById("doubts-tab-link");
+                study_tab.classList.add("nav-link-dark");
+                doubts_tab.classList.add("nav-link-dark");
+            }
+        </script>
         <div id="msg-display">
         <ul id="msg-display-list" style="margin-left: -39px;">
             {% for msg in batch_data.messages|reverse %}
@@ -89,6 +97,7 @@
                             <div class="card-body">
                                 <b style="margin-top:-2px;">{{msg.sender}}</b>
                                 <p style="margin-bottom:-1px;margin-top:10px;">{{msg.value | safe}}</p>
+                                <p class="timestamp"><small>{{msg.timestamp}}</small></p>
                             </div>
                         </div>
                     {% else %}
@@ -101,6 +110,7 @@
                                 <div class="file-action-btn" id="file-action-btn">
                                     <a class="btn {{profile_data['theme']['buttons']}}" href="{{msg.value[1]}}" target="_blank">Open/Download</a>
                                 </div>
+                                <p class="timestamp"><small>{{msg.timestamp}}</small></p>
                             </div>
                         </div>
                     {% endif %}
@@ -148,6 +158,8 @@
             </li>
             <br />
             {% endfor %}
+            {% else %}
+                <p style="width:100%; text-align: center;">No doubts have been asked in this batch as of now.</p>
             {% endif %}
             </ul>
             <script>

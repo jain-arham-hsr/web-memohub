@@ -138,3 +138,18 @@
 .reply-form textarea {
     margin-right: 5px;
 }
+
+.nav-link-dark {
+    color: white !important;
+}
+
+.nav-link-dark.active{
+    background-color: #343a40 !important;
+}
+
+.timestamp {
+    width: 100%;
+    text-align: right;
+    font-weight: 360;
+    margin-bottom: -10px;
+}
