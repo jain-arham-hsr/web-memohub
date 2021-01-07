@@ -146,4 +146,4 @@ def handle_send_reply(data):
 
 # Runs App
 if __name__ == '__main__':
-    socket_io.run(app, debug=False)
+    socket_io.run(app, debug=True)

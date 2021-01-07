@@ -222,6 +222,19 @@ def login_required(f):
     return wrap
 
 
+def ssl_required(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if not any([settings.DEBUG, request.is_secure(), request.META.get("HTTP_X_FORWARDED_PROTO", "") == 'https']):
+            return f(*args, **kwargs)
+        else:
+            url = request.build_absolute_uri(request.get_full_path())
+            secure_url = url.replace("http://", "https://")
+            return redirect(secure_url)
+    return wrap
+
+
+
 def set_theme():
     session['profile_data']['theme'] = ast.literal_eval(config("THEME"))[Firebase.retrieve_data(f"users/{session.get('uid')}/theme")]
 
