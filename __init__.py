@@ -12,8 +12,17 @@ from helpers import LazyView, Firebase, Memohub, validate_file_format
 app = Flask(__name__)
 app.config.from_object('config.BaseConfig')
 
+csp = {
+    'default-src': ['\'self\''],
+    'script-src': ['*',
+                   '\'unsafe-inline\''],
+    'style-src': ['*',
+                  '\'unsafe-inline\''],
+    'img-src': ['*']
+}
+
 socket_io = SocketIO(app)
-talisman = Talisman(app)
+talisman = Talisman(app, content_security_policy=csp)
 
 app.add_url_rule('/',
                  view_func=LazyView('views.home'))
