@@ -103,7 +103,7 @@ def create_batch():
                                       request.form['subject']):
             flash("Couldn't create batch due to duplicate data.")
             return redirect(url_for('dashboard'))
-        batch_id = datetime.now().astimezone(timezone).strftime("%Y%m%d%H%M%S%f%z")
+        batch_id = datetime.now().astimezone(timezone).strftime("%Y%m%d%H%M%S%f")
         Firebase.save_data(f'batches/batch_{batch_id}', {
             'name': request.form['class-name'],
             'section': request.form['section'],

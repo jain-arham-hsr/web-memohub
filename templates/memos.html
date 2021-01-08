@@ -161,8 +161,7 @@
                 <p id="empty-doubts-info" style="width:100%; text-align: center; margin-top: 10px;">No doubts have been asked in this batch as of now.</p>
             {% endif %}
             <script>
-                replyForms = document.querySelectorAll("form.reply-form");
-                replyForms.forEach((form) => {
+                var defineFormAction = function(form) {
                     form.onsubmit = function (e) {
                         e.preventDefault()
                         let msg_input = form.querySelector("textarea")
@@ -178,6 +177,10 @@
                         msg_input.value = '';
                         msg_input.focus();
                     }
+                }
+                var replyForms = document.querySelectorAll("form.reply-form");
+                replyForms.forEach((form) => {
+                    defineFormAction(form);
                 });
             </script>
         </div>
@@ -247,6 +250,7 @@
                         </div>
                     </div>
                     <br>`;
+                defineFormAction(document.getElementById(`reply_form_${toString(containerLength)}`))
                 if (containerLength > 0){
                     doubt_list.insertBefore(newNode, doubt_list.firstChild);
                 } else {
