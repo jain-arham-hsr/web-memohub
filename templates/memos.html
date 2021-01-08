@@ -217,8 +217,13 @@
         <script>
             socket.on('receive_query', function (data) {
                 var doubt_list = document.getElementById("doubts");
-                console.log(doubt_list);
-                console.log(data);
+                if (!doubt_list) {
+                    doubt_list = document.createElement("ul");
+                    var empty_doubts = document.getElementById("empty-doubts-info");
+                    document.getElementById("doubts-section").insertBefore(doubt_list, empty_doubts);
+                    doubt_list.id = "doubts";
+                    empty_doubts.style.display = "none";
+                }
                 const newNode = document.createElement('li');
                 const allNodes = doubt_list.querySelector("li");
                 let containerLength = 0;
@@ -242,20 +247,10 @@
                         </div>
                     </div>
                     <br>`;
-                console.log("Doubt-List:" + doubt_list);
-                if (!doubt_list) {
-                    console.log(true);
-                    const doubts = document.createElement("ul");
-                    console.log(doubts);
-                    doubts.appendChild(newNode);
-                    console.log(doubts);
-                    const empty_doubts = document.getElementById("empty-doubts-info");
-                    doubts.insertBefore(doubt_list, empty_doubts);
-                    doubts.id = "doubts";
-                    empty_doubts.style.display = "none";
-                } else {
-                    console.log(doubt_list);
+                if (containerLength > 0){
                     doubt_list.insertBefore(newNode, doubt_list.firstChild);
+                } else {
+                    doubt_list.appendChild(newNode);
                 }
             });
             socket.on('receive_reply', function (data) {

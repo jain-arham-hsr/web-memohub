@@ -129,7 +129,7 @@ def handle_post_query(data):
     query = data['query']
     profile_img = session.get('profile_pic')
     Memohub.save_query(batch_id, sender, query, profile_img)
-    timestamp = get_timezone()
+    timestamp = get_timestamp()
     payload = {
         'timestamp': timestamp,
         'author': sender,
