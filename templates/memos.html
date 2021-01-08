@@ -242,10 +242,12 @@
                     </div>
                     <br>`;
                 if (!doubt_list) {
-                    const doubts = document.createElement("ul")
+                    const doubts = document.createElement("ul");
                     doubts.appendChild(newNode);
-                    const empty_doubts = document.getElementById("empty-doubts-info")
-                    doubts.insertBefore(doubt_list, empty_doubts)
+                    console.log(doubts);
+                    const empty_doubts = document.getElementById("empty-doubts-info");
+                    doubts.insertBefore(doubt_list, empty_doubts);
+                    doubts.id = "doubts";
                     empty_doubts.style.display = "none";
                 } else {
                     doubt_list.insertBefore(newNode, doubt_list.firstChild);
