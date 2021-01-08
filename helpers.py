@@ -7,6 +7,7 @@ import ast
 from werkzeug.utils import import_string, cached_property
 from functools import wraps
 from decouple import config
+import pytz
 
 from firebase_admin import credentials, initialize_app, storage, db, auth
 import firebase_admin
@@ -255,3 +256,6 @@ def validate_file_format(filename):
 
 def format_email(email):
     return re.sub("[^a-zA-Z]", "_", email)
+
+
+timezone = pytz.timezone("Asia/Kolkata")

@@ -8,7 +8,7 @@ import ast
 import pytz
 
 # noinspection PyPackageRequirements,PyUnresolvedReferences
-from helpers import LazyView, Firebase, Memohub, validate_file_format
+from helpers import LazyView, Firebase, Memohub, validate_file_format, timezone
 
 app = Flask(__name__)
 app.config.from_object('config.BaseConfig')
@@ -63,8 +63,6 @@ app.add_url_rule('/changeTheme',
                  methods=['POST'])
 app.add_url_rule('/logout',
                  view_func=LazyView('views.logout'))
-
-timezone = pytz.timezone("Asia/Kolkata")
 
 
 @socket_io.on('join_room')
