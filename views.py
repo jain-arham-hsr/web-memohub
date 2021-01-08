@@ -100,17 +100,17 @@ def create_batch():
                                       request.form['subject']):
             flash("Couldn't create batch due to duplicate data.")
             return redirect(url_for('dashboard'))
-        batch_id = timezone.localize(datetime.now()).strftime("%Y%m%d%H%M%S%f%z")
+        batch_id = datetime.now().astimezone(timezone).strftime("%Y%m%d%H%M%S%f%z")
         Firebase.save_data(f'batches/batch_{batch_id}', {
             'name': request.form['class-name'],
             'section': request.form['section'],
             'subject': request.form['subject'],
             'batch_id': batch_id,
             'created-by': session.get('uid'),
-            'creation-date': timezone.localize(datetime.now()).strftime("%B %d, %Y"),
+            'creation-date': datetime.now().astimezone(timezone).strftime("%B %d, %Y"),
             'messages': [
                 {
-                    'timestamp': timezone.localize(datetime.now()).strftime("%H:%M %B %d, %Y"),
+                    'timestamp': datetime.now().astimezone(timezone).strftime("%H:%M %B %d, %Y"),
                     'type': 'text',
                     'sender': 'MemoHub',
                     'value': f'{request.form["class-name"]} "{request.form["section"]}" ({request.form["subject"]}) created.'

@@ -176,7 +176,7 @@ class Memohub:
     @staticmethod
     def save_text_msg(batch_id, sender, msg):
         Firebase.append_data(f'batches/batch_{batch_id}/messages', {
-            'timestamp': timezone.localize(datetime.now()).strftime("%H:%M %B %d, %Y"),
+            'timestamp': datetime.now().astimezone(timezone).strftime("%H:%M %B %d, %Y"),
             'type': 'text',
             'sender': sender,
             'value': msg
@@ -185,7 +185,7 @@ class Memohub:
     @staticmethod
     def save_attach_msg(batch_id, sender, topic, file_url):
         Firebase.append_data(f'batches/batch_{batch_id}/messages', {
-            'timestamp': timezone.localize(datetime.now()).strftime("%H:%M %B %d, %Y"),
+            'timestamp': datetime.now().astimezone(timezone).strftime("%H:%M %B %d, %Y"),
             'type': 'file',
             'sender': sender,
             'value': [topic, file_url]
@@ -194,7 +194,7 @@ class Memohub:
     @staticmethod
     def save_query(batch_id, sender, query, profile_img):
         Firebase.append_data(f'batches/batch_{batch_id}/threads', {
-            'timestamp': timezone.localize(datetime.now()).strftime("%H:%M %B %d, %Y"),
+            'timestamp': datetime.now().astimezone(timezone).strftime("%H:%M %B %d, %Y"),
             'author': sender,
             'profile_img': profile_img,
             'query': query,
@@ -203,7 +203,7 @@ class Memohub:
     @staticmethod
     def save_reply(batch_id, sender, msg, profile_img, thread):
         Firebase.append_data(f'batches/batch_{batch_id}/threads/{thread}/sub_threads', {
-            'timestamp': timezone.localize(datetime.now()).strftime("%H:%M %B %d, %Y"),
+            'timestamp': datetime.now().astimezone(timezone).strftime("%H:%M %B %d, %Y"),
             'author': sender,
             'profile_img': profile_img,
             'msg': msg

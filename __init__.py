@@ -5,7 +5,6 @@ from werkzeug.utils import secure_filename
 from datetime import datetime
 from decouple import config
 import ast
-import pytz
 
 # noinspection PyPackageRequirements,PyUnresolvedReferences
 from helpers import LazyView, Firebase, Memohub, validate_file_format, timezone
@@ -77,7 +76,7 @@ def handle_send_text_msg_event(data):
     display_name = session.get('display_name')
     msg = data['message']
     Memohub.save_text_msg(batch_id, display_name, msg)
-    timestamp = timezone.localize(datetime.now()).strftime("%H:%M %B %d, %Y")
+    timestamp = datetime.now().astimezone(timezone).strftime("%H:%M %B %d, %Y")
     payload = {
         'timestamp': timestamp,
         'sender': display_name,
@@ -98,13 +97,13 @@ def send_attach_msg():
                 sender = session.get('display_name')
                 content_type = ast.literal_eval(config("ALLOWED_EXTENSIONS"))[
                     secure_filename(file.filename).rsplit('.', 1)[1].lower()]
-                file_id = timezone.localize(datetime.now()).strftime("%Y%m%d%H%M%S%f%z")
+                file_id = datetime.now().astimezone(timezone).strftime("%Y%m%d%H%M%S%f%z")
                 file_url = Firebase.upload_file_to_storage(file,
                                                            f"file_{file_id}.{secure_filename(file.filename).rsplit('.', 1)[1].lower()}",
                                                            content_type)
                 topic = file.filename
                 Memohub.save_attach_msg(batch_id, sender, topic, file_url)
-                timestamp = timezone.localize(datetime.now()).strftime("%H:%M %B %d, %Y")
+                timestamp = datetime.now().astimezone(timezone).strftime("%H:%M %B %d, %Y")
                 upload_data = {
                     'timestamp': timestamp,
                     'sender': display_name,
@@ -127,7 +126,7 @@ def handle_post_query(data):
     # only for testing purposes
     profile_img = "https://firebasestorage.googleapis.com/v0/b/project-aa-e98db.appspot.com/o/profileImage.jpg?alt=media&token=6dc5a27f-7bdd-49e8-ba8e-bfd5f61237b1"
     Memohub.save_query(batch_id, sender, query, profile_img)
-    timestamp = timezone.localize(datetime.now()).strftime("%H:%M %B %d, %Y")
+    timestamp = datetime.now().astimezone(timezone).strftime("%H:%M %B %d, %Y")
     payload = {
         'timestamp': timestamp,
         'author': sender,
@@ -146,7 +145,7 @@ def handle_send_reply(data):
     # only for testing purposes
     profile_img = "https://firebasestorage.googleapis.com/v0/b/project-aa-e98db.appspot.com/o/profileImage.jpg?alt=media&token=6dc5a27f-7bdd-49e8-ba8e-bfd5f61237b1"
     Memohub.save_reply(batch_id, sender, reply, profile_img, thread)
-    timestamp = timezone.localize(datetime.now()).strftime("%H:%M %B %d, %Y")
+    timestamp = datetime.now().astimezone(timezone).strftime("%H:%M %B %d, %Y")
     payload = {
         'timestamp': timestamp,
         'author': sender,
