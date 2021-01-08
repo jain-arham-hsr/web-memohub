@@ -6,8 +6,9 @@
 <script>
     document.body.style.overflowX = 'hidden';
     window.onload = function() {
-        if (not {{signed_out | safe}}) {
-            if ({{profile_data.theme.theme_name}}) {
+        signed_out_bool = "{{signed_out | safe}}";
+        if (singed_out_bool != "True") {
+            if ({{profile_data.theme.theme_name}} == 'dark') {
                     const wrapper = document.getElementById("wrapper");
                     wrapper.style.marginTop: '-24px';
                     wrapper.style.marginLeft: '-15px';
