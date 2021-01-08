@@ -11,10 +11,11 @@ Firebase = Firebase()
 
 
 def home():
-    if session.get('uid', None):
+    if session.get('uid', False):
         signed_out = False
     else:
         signed_out = True
+    print(signed_out)
     return render_template('home.html', signed_out=signed_out)
 
 
