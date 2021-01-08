@@ -16,7 +16,7 @@ def home():
         set_theme()
     else:
         signed_out = True
-    return render_template('home.html', signed_out=signed_out, profile_data=session.get('profile_data', None))
+    return render_template('home.html', signed_out=signed_out, profile_data=session.get('profile_data', {'theme': {'theme_name': 'light'}}))
 
 
 def auth(action):
