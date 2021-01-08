@@ -229,7 +229,7 @@
                 }
                 const newNode = document.createElement('li');
                 const allNodes = doubt_list.querySelector("li");
-                let containerLength = 0;
+                var containerLength = 0;
                 if (allNodes) {
                     containerLength = allNodes.length;
                 }
@@ -254,6 +254,7 @@
                     console.log(containerLength);
                     doubt_list.insertBefore(newNode, doubt_list.firstChild);
                 } else {
+                    console.log(containerLength);
                     doubt_list.appendChild(newNode);
                 }
                 defineFormAction(document.getElementById(`reply_form_${toString(containerLength)}`))
