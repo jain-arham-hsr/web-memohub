@@ -15,8 +15,7 @@ def home():
         signed_out = False
     else:
         signed_out = True
-    print(signed_out)
-    return render_template('home.html', signed_out=signed_out)
+    return render_template('home.html', signed_out=signed_out, profile_data=session.get('profile_data', None))
 
 
 def auth(action):
