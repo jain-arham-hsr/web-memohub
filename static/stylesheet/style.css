@@ -78,7 +78,7 @@ html, body {
 
 /* When you mouse over the container, fade in the overlay icon*/
 .img-container:hover .overlay {
-  opacity: 0.5;
+  opacity: 0.7;
 }
 
 /* The icon inside the overlay is positioned in the middle vertically and horizontally */
@@ -92,6 +92,11 @@ html, body {
   transform: translate(-50%, -50%);
   -ms-transform: translate(-50%, -50%);
   text-align: center;
+}
+
+.icon:hover {
+    color: #fff !important;
+    text-decoration: none !important;
 }
 
 /* When you move the mouse over the icon, change color */
