@@ -4,7 +4,7 @@ from firebase_admin._auth_utils import UserNotFoundError
 from datetime import datetime
 
 # noinspection PyPackageRequirements,PyUnresolvedReferences
-from helpers import login_required, Firebase, Memohub, set_theme, validate_duplicate_batches, format_email, timezone
+from helpers import login_required, Firebase, Memohub, set_theme, validate_duplicate_batches, format_email, timezone, get_timestamp
 
 
 Firebase = Firebase()
@@ -110,7 +110,7 @@ def create_batch():
             'creation-date': datetime.now().astimezone(timezone).strftime("%B %d, %Y"),
             'messages': [
                 {
-                    'timestamp': datetime.now().astimezone(timezone).strftime("%H:%M %B %d, %Y"),
+                    'timestamp': get_timestamp(),
                     'type': 'text',
                     'sender': 'MemoHub',
                     'value': f'{request.form["class-name"]} "{request.form["section"]}" ({request.form["subject"]}) created.'
