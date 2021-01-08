@@ -5,19 +5,19 @@
 
 <script>
     document.body.style.overflowX = 'hidden';
-    window.onload = function() {
+</script>
+
+<div id="wrapper">
+    <script>
         signed_out_bool = "{{signed_out | safe}}";
         if (signed_out_bool != "True") {
-            if ({{profile_data.theme.theme_name}} == 'dark') {
+            if ("{{profile_data.theme.theme_name}}" == 'dark') {
                     const wrapper = document.getElementById("wrapper");
                     wrapper.style.marginTop = '-24px';
                     wrapper.style.marginLeft = '-15px';
             }
         }
-    }
-</script>
-
-<div id="wrapper">
+    </script>
     <div class="cover">
         <div class="cover-content">
             <h1 id="motto">Share study material<br>&nbsp;like never before</h1>
