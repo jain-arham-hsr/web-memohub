@@ -168,6 +168,7 @@
                         let message = msg_input.value.trimEnd().replace(/(?:\r\n|\r|\n)/g, '<br />');
                         const doubts = document.getElementById("doubts")
                         const thread = doubts.querySelectorAll("li").length - parseInt(form.id.replace("reply_form_", ''));
+                        console.log(thread);
                         if (message.length) {
                             socket.emit('send_reply', {
                                 thread: thread,
