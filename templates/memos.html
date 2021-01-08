@@ -215,7 +215,7 @@
             }
         </script>
         <script>
-            const doubt_list = document.getElementById("doubts");
+            var doubt_list = document.getElementById("doubts");
             console.log(doubt_list)
             socket.on('receive_query', function (data) {
                 console.log(doubt_list);
