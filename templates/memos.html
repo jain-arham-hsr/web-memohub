@@ -215,7 +215,7 @@
             }
         </script>
         <script>
-            const doubt_list = document.getElementById("doubts");
+            var doubt_list = document.getElementById("doubts");
             socket.on('receive_query', function (data) {
                 console.log(data);
                 const newNode = document.createElement('li');
@@ -243,7 +243,7 @@
                     <br>`;
                 if (!doubt_list) {
                     doubt_list = document.createElement("ul")
-                    empty_doubts = document.getElementById("empty-doubts-info")
+                    const empty_doubts = document.getElementById("empty-doubts-info")
                     doubts.insertBefore(doubt_list, empty_doubts)
                     empty_doubts.style.display = "none";
                     doubt_list.appendChild(newNode);
