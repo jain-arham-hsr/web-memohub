@@ -89,13 +89,28 @@
                 <div class="modal-body">
                     <div class="media">
                         <div class="img-container">
-                            <img src="https://firebasestorage.googleapis.com/v0/b/project-aa-e98db.appspot.com/o/profileImage.jpg?alt=media&token=6dc5a27f-7bdd-49e8-ba8e-bfd5f61237b1" alt="Avatar" class="mr-3 mt-3 rounded-circle profile-image" style="width:76px;">
-                            <div class="overlay">
-                                <a href="#" class="icon" title="User Profile">
-                                <i class="fa fa-user"></i>
+                            <img src="{{profile_data.profilePicture}}" alt="Avatar" class="mr-3 mt-3 rounded-circle profile-image">
+                            <div class="overlay mt-3">
+                                <form id="profile-img-form" enctype="multipart/form-data" action="{{url_for('change_profile_pic')}}" method="POST">
+                                    <input id="profile-img-upload" name="newPicture" type="file" accept=".png,.jpg,.jpeg" />
+                                </form>
+                                <a href="#" class="icon" id="profile-img-upload-link" title="User Profile">
+                                <i class="fa fa-edit"></i>
                                 </a>
                             </div>
                         </div>
+                        <script>
+                            $(function(){
+                                $("#profile-img-upload-link").on('click', function(e){
+                                    e.preventDefault();
+                                    $("#profile-img-upload:hidden").trigger('click');
+                                });
+                            });
+                            document.getElementById("profile-img-upload").onchange = function() {
+                                $('#profile').modal('hide');
+                                document.getElementById("profile-img-form").submit();
+                            };
+                        </script>
                         <div class="media-body">
                             <h4>{{profile_data.displayName}} <small>({{profile_data.userCat}})</small></h4>
                             <p>{{profile_data.email}}</p>

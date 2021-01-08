@@ -23,7 +23,7 @@ csp = {
 }
 
 socket_io = SocketIO(app)
-talisman = Talisman(app, content_security_policy=csp)
+# talisman = Talisman(app, content_security_policy=csp)
 
 app.add_url_rule('/',
                  view_func=LazyView('views.home'))
@@ -60,6 +60,9 @@ app.register_error_handler(404, f=LazyView('views.not_found_error'))
 app.register_error_handler(405, f=LazyView('views.method_not_allowed_error'))
 app.add_url_rule('/changeTheme',
                  view_func=LazyView('views.change_theme'),
+                 methods=['POST'])
+app.add_url_rule('/changeProfilePicture',
+                 view_func=LazyView('views.change_profile_pic'),
                  methods=['POST'])
 app.add_url_rule('/logout',
                  view_func=LazyView('views.logout'))
@@ -124,8 +127,7 @@ def handle_post_query(data):
     batch_id = session.get('last_batch_opened')
     sender = session.get('display_name')
     query = data['query']
-    # only for testing purposes
-    profile_img = "https://firebasestorage.googleapis.com/v0/b/project-aa-e98db.appspot.com/o/profileImage.jpg?alt=media&token=6dc5a27f-7bdd-49e8-ba8e-bfd5f61237b1"
+    profile_img = session.get('profile_pic')
     Memohub.save_query(batch_id, sender, query, profile_img)
     timestamp = get_timezone()
     payload = {
@@ -143,8 +145,7 @@ def handle_send_reply(data):
     sender = session.get('display_name')
     reply = data['message']
     thread = data['thread']
-    # only for testing purposes
-    profile_img = "https://firebasestorage.googleapis.com/v0/b/project-aa-e98db.appspot.com/o/profileImage.jpg?alt=media&token=6dc5a27f-7bdd-49e8-ba8e-bfd5f61237b1"
+    profile_img = session.get('profile_pic')
     Memohub.save_reply(batch_id, sender, reply, profile_img, thread)
     timestamp = get_timestamp()
     payload = {

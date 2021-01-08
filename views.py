@@ -1,10 +1,11 @@
-from flask import session, request, render_template, redirect, url_for, flash, get_flashed_messages
+from flask import session, request, render_template, redirect, url_for, flash
 # noinspection PyProtectedMember
 from firebase_admin._auth_utils import UserNotFoundError
 from datetime import datetime
+from werkzeug.utils import secure_filename
 
 # noinspection PyPackageRequirements,PyUnresolvedReferences
-from helpers import login_required, Firebase, Memohub, set_theme, validate_duplicate_batches, format_email, timezone, get_timestamp
+from helpers import login_required, Firebase, Memohub, set_theme, validate_duplicate_batches, timezone, get_timestamp
 
 
 Firebase = Firebase()
@@ -32,7 +33,7 @@ def auth_verification():
             password = request.form['password']
             # noinspection PyBroadException
             try:
-                uid, display_name = Firebase.login(email, password)
+                uid, display_name, profile_pic = Firebase.login(email, password)
             except Exception as e:
                 session['error_msg'] = str(e)
                 return redirect(url_for('auth', action="login"))
@@ -43,8 +44,10 @@ def auth_verification():
             session['profile_data'] = {
                 "displayName": display_name,
                 "email": email,
+                "profilePicture": profile_pic,
                 "userCat": session.get('user_cat')
             }
+            session['profile_pic'] = profile_pic
             return redirect(url_for('dashboard'))
         else:
             f_name = request.form['f_name']
@@ -157,12 +160,7 @@ def add_participant():
             else:
                 session['error_msg'] = "User already enrolled in this batch. Please enter email of some other user."
         except UserNotFoundError:
-            if f"batch_{batch_id}" not in (Firebase.retrieve_data(f"pendingInvitation/{format_email(email)}") or []):
-                Firebase.append_data(f"pendingInvitation/{format_email(email)}", f"batch_{batch_id}")
-                Firebase.append_data(f'batches/batch_{batch_id}/participants', (request.form['email'], 'undefined'))
-                Memohub.save_text_msg(batch_id, "MemoHub", f"'{email}' added to this batch.")
-            else:
-                session['error_msg'] = "User already enrolled in this batch. Please enter email of some other user."
+            session['error_msg'] = "User with that email doesn't exist in our database."
         except ValueError:
             session['error_msg'] = "Please enter a valid email address."
         return redirect(url_for('batch', batch_id=batch_id))
@@ -227,6 +225,23 @@ def change_theme():
         set_theme()
         return redirect(url_for('dashboard'))
     set_theme()
+    return render_template('404.html')
+
+
+def change_profile_pic():
+    print(True)
+    if request.method == 'POST':
+        new_picture = request.files['newPicture']
+        file_type = {'png': 'image/png', 'jpg': 'image/jpeg', 'jpeg': 'image/jpeg'}[secure_filename(new_picture.filename).split('.')[1]]
+        print(file_type)
+        filename = f"{session.get('uid')}_profilePicture.{file_type}"
+        Firebase.delete_file_from_storage(filename)
+        photo_url = Firebase.upload_file_to_storage(new_picture, filename, f"image/{file_type}")
+        Firebase.update_user_by_uid(session.get('uid'), session.get('display_name'), photo_url)
+        session['profile_pic'] = photo_url
+        session['profile_data']['profilePicture'] = photo_url
+        print(photo_url)
+        return redirect(url_for('dashboard'))
     return render_template('404.html')
 
 

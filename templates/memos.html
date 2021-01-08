@@ -18,7 +18,7 @@
 
 <script>
     var socket_url;
-    socket_url = 'https://' + document.domain + ':' + location.port;
+    socket_url = 'http://' + document.domain + ':' + location.port;
     const socket = io.connect(socket_url, {transports: ['websocket']});
     var joined_room = false;
     socket.on('connect', function () {
@@ -123,23 +123,21 @@
             {% if cat == 'student' %}
                 <button type="button" id="ask-ques-btn" data-toggle="modal" data-target="#queryModal" class="btn {{profile_data['theme']['buttons']}} btn-block m3">Ask a Query</button>
             {% endif %}
-            <ul id="doubts">
             {% if batch_data.threads %}
-                <script>const batch_data = {{batch_data.threads | safe}}</script>
+            <ul id="doubts">
             {% for thread in batch_data.threads | reverse %}
-                <script>console.log({{thread | safe}})</script>
             <li>
              <div class="card {{profile_data['theme']['cards']}} text-message-memo">
                 <div class="card-body">
                     <div class="media p-3">
-                        <img src="{{thread.profile_img}}" alt="{{thread.author}}" class="mr-3 mt-3 rounded-circle" style="width:60px;">
+                        <img src="{{thread.profile_img}}" alt="{{thread.author}}" class="mr-3 mt-3 rounded-circle" style="width:60px;height:60px;">
                         <div class="media-body">
                             <h5>{{thread.author}} <small><i>{{thread.timestamp}}</i></small></h5>
                             <p>{{thread.query}}</p>
                             {% if thread.sub_threads %}
                             {% for sub_thread in thread.sub_threads %}
                             <div class="media p-3">
-                                <img src="{{sub_thread.profile_img}}" alt="{{sub_thread.author}}" class="mr-3 mt-3 rounded-circle" style="width:45px;">
+                                <img src="{{sub_thread.profile_img}}" alt="{{sub_thread.author}}" class="mr-3 mt-3 rounded-circle" style="width:45px;height:45px;">
                                 <div class="media-body">
                                     <h5>{{sub_thread.author}} <small><i>{{sub_thread.timestamp}}</i></small></h5>
                                     <p>{{sub_thread.msg}}</p>
@@ -156,12 +154,12 @@
                 </div>
              </div>
             </li>
-            <br />
+            <br>
             {% endfor %}
+            </ul>
             {% else %}
                 <p style="width:100%; text-align: center;">No doubts have been asked in this batch as of now.</p>
             {% endif %}
-            </ul>
             <script>
                 replyForms = document.querySelectorAll("form.reply-form");
                 replyForms.forEach((form) => {
@@ -230,7 +228,7 @@
                     <div class="card {{profile_data['theme']['cards']}} text-message-memo">
                         <div class="card-body">
                             <div class="media p-3">
-                                <img src="${data.profile_img}" alt="${data.author}" class="mr-3 mt-3 rounded-circle" style="width:60px;">
+                                <img src="${data.profile_img}" alt="${data.author}" class="mr-3 mt-3 rounded-circle" style="width:60px;height:60px;">
                                 <div class="media-body">
                                     <h5>${data.author} <small><i>${data.timestamp}</i></small></h5>
                                     <p>${data.query}</p>
@@ -252,7 +250,7 @@
                 newNode.classList.add("media");
                 newNode.classList.add("p-3");
                 newNode.innerHTML = `
-                    <img src="${data.profile_img}" alt="${data.author}" class="mr-3 mt-3 rounded-circle" style="width:45px;">
+                    <img src="${data.profile_img}" alt="${data.author}" class="mr-3 mt-3 rounded-circle" style="width:45px;height:45px;">
                     <div class="media-body">
                         <h5>${data.author} <small><i>${data.timestamp}</i></small></h5>
                         <p>${data.reply}</p>

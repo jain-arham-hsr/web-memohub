@@ -2,7 +2,6 @@ from flask import session, redirect, url_for
 from datetime import datetime
 import requests
 import json
-import re
 import ast
 from werkzeug.utils import import_string, cached_property
 from functools import wraps
@@ -58,7 +57,6 @@ class Firebase:
                 'batches': [],
                 'theme': 'light'
             })
-            check_for_pending_invitations(local_id, email, user_cat)
         except:
             raise Exception(response['error']['message'])
 
@@ -79,7 +77,7 @@ class Firebase:
         except:
             raise Exception(response['error']['message'])
         if email_verified:
-            return user_data['localId'], user_data['displayName']
+            return user_data['localId'], user_data['displayName'], user_data['photoUrl']
         else:
             self.send_verification_email(id_token)
             raise Exception("Email not verified yet. Please check your Inbox for verification email.")
@@ -146,6 +144,12 @@ class Firebase:
         return blob.public_url
 
     @staticmethod
+    def delete_file_from_storage(filename):
+        bucket = storage.bucket()
+        if bucket.get_blob(filename):
+            bucket.delete_blob(filename)
+
+    @staticmethod
     def save_data(key, value):
         ref = db.reference(key)
         ref.set(value)
@@ -169,6 +173,12 @@ class Firebase:
         batches_array = Firebase.retrieve_data(key)
         batches_array.remove(value_to_remove)
         Firebase.save_data(key, batches_array)
+
+    @staticmethod
+    def update_user_by_uid(uid, display_name, photo_url):
+        auth.update_user(uid=uid,
+                         display_name=display_name,
+                         photo_url=photo_url)
 
 
 class Memohub:
@@ -225,19 +235,6 @@ def set_theme():
     session['profile_data']['theme'] = ast.literal_eval(config("THEME"))[Firebase.retrieve_data(f"users/{session.get('uid')}/theme")]
 
 
-def check_for_pending_invitations(uid, email, user_cat):
-    formatted_email = format_email(email)
-    if formatted_email in (Firebase.retrieve_data('pendingInvitation') or {}).keys():
-        pending_batch_invitations = Firebase.retrieve_data(f'pendingInvitation/{formatted_email}')
-        # noinspection PyTypeChecker
-        for invitation in pending_batch_invitations:
-            Firebase.append_data(f"users/{uid}/batches", invitation)
-            batch_participants = Firebase.retrieve_data(f'batches/{invitation}/participants')
-            batch_participants[batch_participants.index([email, 'undefined'])] = (email, user_cat)
-            Firebase.save_data(f'batches/{invitation}/participants', batch_participants)
-        Firebase.save_data('pendingInvitation', Firebase.retrieve_data('pendingInvitation').pop(formatted_email, None))
-
-
 def validate_duplicate_batches(name, section, subject):
     batches = Firebase.retrieve_data(f'users/{session["uid"]}/batches') or []
     for batch in batches:
@@ -252,10 +249,6 @@ def validate_duplicate_batches(name, section, subject):
 def validate_file_format(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ast.literal_eval(config("ALLOWED_EXTENSIONS")).keys()
-
-
-def format_email(email):
-    return re.sub("[^a-zA-Z]", "_", email)
 
 
 timezone = pytz.timezone("Asia/Kolkata")
