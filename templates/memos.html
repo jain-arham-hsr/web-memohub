@@ -250,12 +250,12 @@
                         </div>
                     </div>
                     <br>`;
-                defineFormAction(document.getElementById(`reply_form_${toString(containerLength)}`))
                 if (containerLength > 0){
                     doubt_list.insertBefore(newNode, doubt_list.firstChild);
                 } else {
                     doubt_list.appendChild(newNode);
                 }
+                defineFormAction(document.getElementById(`reply_form_${toString(containerLength)}`))
             });
             socket.on('receive_reply', function (data) {
                 console.log(data);
