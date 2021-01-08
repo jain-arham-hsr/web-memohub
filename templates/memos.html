@@ -215,7 +215,7 @@
             }
         </script>
         <script>
-            var doubt_list = document.getElementById("doubts");
+            const doubt_list = document.getElementById("doubts");
             socket.on('receive_query', function (data) {
                 console.log(data);
                 const newNode = document.createElement('li');
@@ -242,11 +242,11 @@
                     </div>
                     <br>`;
                 if (!doubt_list) {
-                    doubt_list = document.createElement("ul")
+                    const doubts = document.createElement("ul")
+                    doubts.appendChild(newNode);
                     const empty_doubts = document.getElementById("empty-doubts-info")
                     doubts.insertBefore(doubt_list, empty_doubts)
                     empty_doubts.style.display = "none";
-                    doubt_list.appendChild(newNode);
                 } else {
                     doubt_list.insertBefore(newNode, doubt_list.firstChild);
                 }
