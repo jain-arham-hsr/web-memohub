@@ -158,7 +158,7 @@
             {% endfor %}
             </ul>
             {% else %}
-                <p style="width:100%; text-align: center;">No doubts have been asked in this batch as of now.</p>
+                <p id="empty-doubts-info" style="width:100%; text-align: center; margin-top: 10px;">No doubts have been asked in this batch as of now.</p>
             {% endif %}
             <script>
                 replyForms = document.querySelectorAll("form.reply-form");
@@ -182,11 +182,11 @@
             </script>
         </div>
         <script>
-            doubts = document.getElementById("doubts-section");
-            doubts_tab = document.getElementById("doubts-tab-link")
-            study_material = document.getElementById("msg-display")
-            study_tab = document.getElementById("study-tab-link")
-            study_mode = function () {
+            const doubts = document.getElementById("doubts-section");
+            const doubts_tab = document.getElementById("doubts-tab-link")
+            const study_material = document.getElementById("msg-display")
+            const study_tab = document.getElementById("study-tab-link")
+            const study_mode = function () {
                 study_material.style.display = "block";
                 doubts.style.display = "none";
                 study_tab.classList.add("active")
@@ -198,7 +198,7 @@
                     }
                 {% endif %}
             }
-            doubts_mode = function () {
+            const doubts_mode = function () {
                 study_material.style.display = "none";
                 doubts.style.display = "block";
                 study_tab.classList.remove("active")
@@ -241,8 +241,15 @@
                         </div>
                     </div>
                     <br>`;
-
-                doubt_list.insertBefore(newNode, doubt_list.firstChild);
+                if (!doubt_list) {
+                    doubt_list = document.createElement("ul")
+                    empty_doubts = document.getElementById("empty-doubts-info")
+                    doubts.insertBefore(doubt_list, empty_doubts)
+                    empty_doubts.style.display = "none";
+                    doubt_list.appendChild(newNode);
+                } else {
+                    doubt_list.insertBefore(newNode, doubt_list.firstChild);
+                }
             });
             socket.on('receive_reply', function (data) {
                 console.log(data);
