@@ -242,7 +242,9 @@
                     </div>
                     <br>`;
                 if (!doubt_list) {
+                    console.log(true);
                     const doubts = document.createElement("ul");
+                    console.log(doubts);
                     doubts.appendChild(newNode);
                     console.log(doubts);
                     const empty_doubts = document.getElementById("empty-doubts-info");
@@ -250,6 +252,7 @@
                     doubts.id = "doubts";
                     empty_doubts.style.display = "none";
                 } else {
+                    console.log(doubt_list);
                     doubt_list.insertBefore(newNode, doubt_list.firstChild);
                 }
             });
