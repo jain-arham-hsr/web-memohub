@@ -216,7 +216,9 @@
         </script>
         <script>
             const doubt_list = document.getElementById("doubts");
+            console.log(doubt_list)
             socket.on('receive_query', function (data) {
+                console.log(doubt_list);
                 console.log(data);
                 const newNode = document.createElement('li');
                 const allNodes = doubt_list.querySelector("li");
