@@ -209,8 +209,6 @@ class Memohub:
         })
 
 
-
-
 # login required decorator function
 def login_required(f):
     @wraps(f)
