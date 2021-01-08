@@ -86,11 +86,11 @@
     </div>
     <div class="form-group">
         <label for="signup-pass">Password:</label>
-        <input class="form-control" type="password" id='signup-pass' name="password" placeholder="Enter password" maxlength="20" minlength="8" autocomplete="off" required>
+        <input class="form-control" type="password" id='signup-pass' name="password" placeholder="Enter password" maxlength="128" minlength="8" autocomplete="off" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Password must be combination of both numbers and uppercase and lowercase letters." required>
     </div>
     <div class="form-group">
         <label for="signup-confirm-pass">Confirm Password:</label>
-        <input class="form-control" type="password" id='signup-confirm-pass' name="confirm-password" placeholder="Enter password again" minlength="8" maxlength="20" autocomplete="off" required>
+        <input class="form-control" type="password" id='signup-confirm-pass' name="confirm-password" placeholder="Enter password again" minlength="8" maxlength="128" autocomplete="off" required>
     </div>
     <input class="btn btn-primary btn-block" type="Submit" id='signup-student' name="action" value="Sign Up as Student" disabled> <br>
     <input class="btn btn-primary btn-block" type="Submit" id='signup-teacher' name="action" value="Sign Up as Teacher" disabled>

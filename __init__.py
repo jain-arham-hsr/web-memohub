@@ -23,7 +23,7 @@ csp = {
 }
 
 socket_io = SocketIO(app)
-# talisman = Talisman(app, content_security_policy=csp)
+talisman = Talisman(app, content_security_policy=csp)
 
 app.add_url_rule('/',
                  view_func=LazyView('views.home'))

@@ -18,7 +18,7 @@
 
 <script>
     var socket_url;
-    socket_url = 'http://' + document.domain + ':' + location.port;
+    socket_url = 'https://' + document.domain + ':' + location.port;
     const socket = io.connect(socket_url, {transports: ['websocket']});
     var joined_room = false;
     socket.on('connect', function () {
