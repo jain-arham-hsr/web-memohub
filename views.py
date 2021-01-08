@@ -11,10 +11,7 @@ Firebase = Firebase()
 
 
 def home():
-    if session.get('uid', None):
-        return redirect(url_for('dashboard'))
-    else:
-        return render_template('home.html', signed_out=True)
+    return render_template('home.html', signed_out=True)
 
 
 def auth(action):
@@ -199,7 +196,7 @@ def remove_batch():
         batch_id = session.get('last_batch_opened', None)
         uid = session.get('uid', None)
         Firebase.remove_list_item(f'users/{uid}/batches', f'batch_{batch_id}')
-        return redirect(url_for('home'))
+        return redirect(url_for('dashboard'))
     set_theme()
     return render_template('404.html')
 
