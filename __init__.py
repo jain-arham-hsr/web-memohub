@@ -18,7 +18,8 @@ csp = {
                    '\'unsafe-inline\''],
     'style-src': ['*',
                   '\'unsafe-inline\''],
-    'img-src': ['*']
+    'img-src': ['*'],
+    'font-src': ['*']
 }
 
 socket_io = SocketIO(app)
