@@ -274,6 +274,7 @@
                     </div>
                     <br>`;
                 const thread_no = doubts.querySelectorAll("li").length - data.thread;
+                console.log(thread_no);
                 const container = doubts.querySelectorAll("li")[thread_no - 1].querySelector(".media-body");
                 const form = container.querySelector("#reply_form_" + thread_no);
                 console.log(form);
