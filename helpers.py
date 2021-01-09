@@ -159,20 +159,18 @@ class Firebase:
         ref = db.reference(key)
         return ref.get()
 
-    @staticmethod
-    def append_data(key, value_to_append):
-        batches_array = Firebase.retrieve_data(key)
+    def append_data(self, key, value_to_append):
+        batches_array = self.retrieve_data(key)
         if batches_array:
             batches_array.append(value_to_append)
-            Firebase.save_data(key, batches_array)
+            self.save_data(key, batches_array)
         else:
-            Firebase.save_data(key, [value_to_append])
+            self.save_data(key, [value_to_append])
 
-    @staticmethod
-    def remove_list_item(key, value_to_remove):
-        batches_array = Firebase.retrieve_data(key)
+    def remove_list_item(self, key, value_to_remove):
+        batches_array = self.retrieve_data(key)
         batches_array.remove(value_to_remove)
-        Firebase.save_data(key, batches_array)
+        self.save_data(key, batches_array)
 
     @staticmethod
     def update_user_by_uid(uid, display_name, photo_url):
@@ -181,11 +179,14 @@ class Firebase:
                          photo_url=photo_url)
 
 
+firebase = Firebase()
+
+
 class Memohub:
 
     @staticmethod
     def save_text_msg(batch_id, sender, msg):
-        Firebase.append_data(f'batches/batch_{batch_id}/messages', {
+        firebase.append_data(f'batches/batch_{batch_id}/messages', {
             'timestamp': get_timestamp(),
             'type': 'text',
             'sender': sender,
@@ -194,7 +195,7 @@ class Memohub:
 
     @staticmethod
     def save_attach_msg(batch_id, sender, topic, file_url):
-        Firebase.append_data(f'batches/batch_{batch_id}/messages', {
+        firebase.append_data(f'batches/batch_{batch_id}/messages', {
             'timestamp': get_timestamp(),
             'type': 'file',
             'sender': sender,
@@ -203,7 +204,7 @@ class Memohub:
 
     @staticmethod
     def save_query(batch_id, sender, query, profile_img):
-        Firebase.append_data(f'batches/batch_{batch_id}/threads', {
+        firebase.append_data(f'batches/batch_{batch_id}/threads', {
             'timestamp': get_timestamp(),
             'author': sender,
             'profile_img': profile_img,
@@ -212,7 +213,7 @@ class Memohub:
 
     @staticmethod
     def save_reply(batch_id, sender, msg, profile_img, thread):
-        Firebase.append_data(f'batches/batch_{batch_id}/threads/{thread}/sub_threads', {
+        firebase.append_data(f'batches/batch_{batch_id}/threads/{thread}/sub_threads', {
             'timestamp': get_timestamp(),
             'author': sender,
             'profile_img': profile_img,
@@ -232,13 +233,13 @@ def login_required(f):
 
 
 def set_theme():
-    session['profile_data']['theme'] = ast.literal_eval(config("THEME"))[Firebase.retrieve_data(f"users/{session.get('uid')}/theme")]
+    session['profile_data']['theme'] = ast.literal_eval(config("THEME"))[firebase.retrieve_data(f"users/{session.get('uid')}/theme")]
 
 
 def validate_duplicate_batches(name, section, subject):
-    batches = Firebase.retrieve_data(f'users/{session["uid"]}/batches') or []
+    batches = firebase.retrieve_data(f'users/{session["uid"]}/batches') or []
     for batch in batches:
-        corresponding_batch_data = Firebase.retrieve_data(f'batches/{batch}')
+        corresponding_batch_data = firebase.retrieve_data(f'batches/{batch}')
         if all([corresponding_batch_data['name'] == name,
                 corresponding_batch_data['section'] == section,
                 corresponding_batch_data['subject'] == subject]):

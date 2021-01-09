@@ -7,7 +7,7 @@ from decouple import config
 import ast
 
 # noinspection PyPackageRequirements,PyUnresolvedReferences
-from helpers import LazyView, Firebase, Memohub, validate_file_format, timezone, get_timestamp
+from helpers import LazyView, firebase, Memohub, validate_file_format, timezone, get_timestamp
 
 app = Flask(__name__)
 app.config.from_object('config.BaseConfig')
@@ -102,7 +102,7 @@ def send_attach_msg():
                 content_type = ast.literal_eval(config("ALLOWED_EXTENSIONS"))[
                     secure_filename(file.filename).rsplit('.', 1)[1].lower()]
                 file_id = datetime.now().astimezone(timezone).strftime("%Y%m%d%H%M%S%f%z")
-                file_url = Firebase.upload_file_to_storage(file,
+                file_url = firebase.upload_file_to_storage(file,
                                                            f"file_{file_id}.{secure_filename(file.filename).rsplit('.', 1)[1].lower()}",
                                                            content_type)
                 topic = file.filename
