@@ -124,8 +124,8 @@
                 <button type="button" id="ask-ques-btn" data-toggle="modal" data-target="#queryModal" class="btn {{profile_data['theme']['buttons']}} btn-block m3">Ask a Query</button>
             {% endif %}
             {% if batch_data.threads %}
-            <ol id="doubts" reversed="reversed">
-            {% for thread in batch_data.threads %}
+            <ul id="doubts">
+            {% for thread in batch_data.threads | reverse %}
             <li>
              <div class="card {{profile_data['theme']['cards']}} text-message-memo">
                 <div class="card-body">
@@ -156,7 +156,7 @@
             </li>
             <br>
             {% endfor %}
-            </ol>
+            </ul>
             {% else %}
                 <p id="empty-doubts-info" style="width:100%; text-align: center; margin-top: 10px;">No doubts have been asked in this batch as of now.</p>
             {% endif %}
