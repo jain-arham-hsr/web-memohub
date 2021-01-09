@@ -243,7 +243,7 @@
                                 <div class="media-body">
                                     <h5>${data.author} <small><i>${data.timestamp}</i></small></h5>
                                     <p>${data.query}</p>
-                                    <form class="reply-form" id="reply_form_${containerLength}">
+                                    <form class="reply-form" id="reply_form_${containerLength + 1}">
                                         <textarea class="form-control reply-thread-msg-input" rows="1" name="reply_msg" placeholder="Enter message..." autocomplete="off" required></textarea>
                                         <button class="btn {{profile_data['theme']['buttons']}}" type="submit">Reply</button>
                                     </form>
@@ -259,7 +259,7 @@
                     console.log(containerLength);
                     doubt_list.appendChild(newNode);
                 }
-                defineFormAction(document.getElementById(`reply_form_${containerLength}`))
+                defineFormAction(document.getElementById(`reply_form_${containerLength + 1}`))
             });
             socket.on('receive_reply', function (data) {
                 console.log(data);
