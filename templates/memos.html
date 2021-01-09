@@ -276,6 +276,7 @@
                 console.log(thread_no + 1);
                 container_list = doubts.querySelectorAll("li")
                 const container = container_list[container_list.length - (thread_no + 1)].querySelector(".media-body");
+                console.log(container);
                 const form = container.querySelector(`#reply_form_${thread_no}`);
                 console.log(form);
                 container.insertBefore(newNode, form);
