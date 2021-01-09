@@ -167,7 +167,7 @@
                         let msg_input = form.querySelector("textarea")
                         let message = msg_input.value.trimEnd().replace(/(?:\r\n|\r|\n)/g, '<br />');
                         const doubts = document.getElementById("doubts")
-                        const thread = doubts.querySelectorAll("li").length - parseInt(form.id.replace("reply_form_", ''));
+                        const thread = parseInt(form.id.replace("reply_form_", ''));
                         console.log(parseInt(form.id.replace("reply_form_", '')));
                         console.log("thread: "+thread);
                         if (message.length) {
@@ -273,9 +273,9 @@
                         <p>${data.reply}</p>
                     </div>
                     <br>`;
-                const thread_no = doubts.querySelectorAll("li").length - data.thread;
+                const thread_no = data.thread;
                 console.log(thread_no);
-                const container = doubts.querySelectorAll("li")[thread_no - 1].querySelector(".media-body");
+                const container = doubts.querySelectorAll("li")[thread_no].querySelector(".media-body");
                 const form = container.querySelector("#reply_form_" + thread_no);
                 console.log(form);
                 container.insertBefore(newNode, form);
