@@ -169,7 +169,7 @@
                         const doubts = document.getElementById("doubts")
                         const thread = doubts.querySelectorAll("li").length - parseInt(form.id.replace("reply_form_", ''));
                         console.log(parseInt(form.id.replace("reply_form_", '')));
-                        console.log("thread": thread);
+                        console.log("thread: "+thread);
                         if (message.length) {
                             socket.emit('send_reply', {
                                 thread: thread,
