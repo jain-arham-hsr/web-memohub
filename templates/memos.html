@@ -275,7 +275,8 @@
                     <br>`;
                 const thread_no = data.thread;
                 console.log(thread_no);
-                const container = doubts.querySelectorAll("li")[thread_no].querySelector(".media-body");
+                container_list = doubts.querySelectorAll("li")
+                const container = container_list[container_list.length - (thread_no + 1)].querySelector(".media-body");
                 const form = container.querySelector("#reply_form_" + thread_no);
                 console.log(form);
                 container.insertBefore(newNode, form);
