@@ -145,6 +145,7 @@ def handle_send_reply(data):
     sender = session.get('display_name')
     reply = data['message']
     thread = data['thread']
+    app.logger.info(thread)
     profile_img = session.get('profile_pic')
     Memohub.save_reply(batch_id, sender, reply, profile_img, thread)
     timestamp = get_timestamp()
