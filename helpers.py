@@ -33,7 +33,8 @@ class Firebase:
     def __init__(self):
         # noinspection PyProtectedMember
         if not firebase_admin._apps:
-            cred = credentials.Certificate("serviceAccountKey.json")
+            cred = credentials.Certificate(config("SERVICE_ACCOUNT_KEY"))
+            print(cred.project_id)
             initialize_app(cred, {"databaseURL": "https://project-aa-e98db-default-rtdb.firebaseio.com",
                                   "storageBucket": "project-aa-e98db.appspot.com"})
         self.FIREBASE_WEB_API_KEY = config("FIREBASE_WEB_API_KEY")
